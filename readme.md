@@ -47,7 +47,7 @@ copy id /d:value [/store:value]
 
 <pre><code>CommandContext rootContext = new CommandContext(
 	"netsh",
-	new Command(new< Action(AddHelper)),
+	new Command(new Action(AddHelper)),
 	new CommandContext(
 		"advfirewall",
 		"Changes to the 'netsh advfirewall' context.",
