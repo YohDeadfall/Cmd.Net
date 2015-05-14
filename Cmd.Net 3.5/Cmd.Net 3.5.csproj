@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5FBD97C2-9498-4B0F-82F5-F8E937F9C92B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cmd.Net</RootNamespace>
+    <AssemblyName>Cmd.Net</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\Cmd.Net.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>bin\Release\Cmd.Net.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Cmd.Net 4.5\Argument.cs">
+      <Link>Argument.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\ArgumentAttribute.cs">
+      <Link>ArgumentAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\ArgumentEnumerator.cs">
+      <Link>ArgumentEnumerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CollectionConverter.cs">
+      <Link>CollectionConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\DelegateCommand.cs">
+      <Link>DelegateCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandArgumentException.cs">
+      <Link>CommandArgumentException.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\Command.cs">
+      <Link>Command.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandCanceledException.cs">
+      <Link>CommandCanceledException.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandCollection.cs">
+      <Link>CommandCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandContext.cs">
+      <Link>CommandContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandContextScope.cs">
+      <Link>CommandContextScope.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandException.cs">
+      <Link>CommandException.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandExtensions.cs">
+      <Link>CommandExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\CommandHelpers.cs">
+      <Link>CommandHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\ErrorAttribute.cs">
+      <Link>ErrorAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\InputAttribute.cs">
+      <Link>InputAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\OutputAttribute.cs">
+      <Link>OutputAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\Properties\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <Link>Properties\Resources.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\ThrowHelper.cs">
+      <Link>ThrowHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\VerbAttribute.cs">
+      <Link>VerbAttribute.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Cmd.Net 4.5\Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Link>Properties\Resources.resx</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -48,7 +48,6 @@ namespace Cmd.Net
         /// and escaped name of the entry point <see cref="T:System.Reflection.Assembly" /> to create a new <see cref="T:Cmd.Net.CommandContext" /> for the scope.
         /// </summary>
         /// <param name="commands">The array of commands to use when creating the scope for a new <see cref="T:Cmd.Net.CommandContext" />.</param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="context" /> is null.</exception>
         public CommandContextScope(params Command[] commands)
             : this(new CommandContext(GetDefaultContextName(), commands))
         {

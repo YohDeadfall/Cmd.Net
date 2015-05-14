@@ -69,7 +69,7 @@ namespace Cmd.Net.Tests
 
             foreach (IEnumerable<Argument> permutation in arguments.Permutations())
             {
-                ArgumentEnumerator enumerator = new ArgumentEnumerator(string.Join(" ", permutation.Select(p => p.Representation)));
+                ArgumentEnumerator enumerator = new ArgumentEnumerator(string.Join(" ", permutation.Select(p => p.Representation).ToArray()));
 
                 foreach (Argument argument in permutation)
                 {

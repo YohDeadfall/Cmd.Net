@@ -58,9 +58,9 @@
     <Compile Include="CommandTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cmd.Net\Cmd.Net.csproj">
+    <ProjectReference Include="..\Cmd.Net 4.5\Cmd.Net 4.5.csproj">
       <Project>{7387e796-34bc-4632-ba5c-706a020884d1}</Project>
-      <Name>Cmd.Net</Name>
+      <Name>Cmd.Net 4.5</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
