@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Cmd.Net.Tests
 {
@@ -52,6 +53,54 @@ namespace Cmd.Net.Tests
             Assert.AreEqual(enumerator1.CurrentName, enumerator2.CurrentName);
             Assert.AreEqual(enumerator1.CurrentValue, enumerator2.CurrentValue);
             Assert.IsFalse(enumerator2.MoveNext());
+        }
+
+        [TestMethod]
+        public void GetEnumeratorFromEmptyEnumerator()
+        {
+            ArgumentEnumerator enumerator1 = ArgumentEnumerator.Empty;
+            ArgumentEnumerator enumerator2 = enumerator1.GetEnumerator();
+            ArgumentEnumerator enumerator3 = enumerator1.GetEnumerator();
+
+            Assert.AreEqual(enumerator1, enumerator3);
+            Assert.AreEqual(enumerator2, enumerator3);
+        }
+
+        [TestMethod]
+        public void GetEnumeratorFromNewEnumerator()
+        {
+            string[] arguments = new string[] { "/first", "/second" };
+            ArgumentEnumerator enumerator1 = new ArgumentEnumerator(arguments);
+            ArgumentEnumerator enumerator2 = enumerator1.GetEnumerator();
+
+            Assert.AreEqual(enumerator1, enumerator2);
+        }
+
+        [TestMethod]
+        public void GetEnumeratorFromSecondThread()
+        {
+            string[] arguments = new string[] { "/first", "/second" };
+            ArgumentEnumerator enumerator1 = new ArgumentEnumerator(arguments);
+            ArgumentEnumerator enumerator2 = null;
+
+            Thread thread = new Thread(() => enumerator2 = enumerator1.GetEnumerator());
+
+            thread.Start();
+            thread.Join();
+
+            Assert.AreNotEqual(enumerator1, enumerator2);
+        }
+
+        [TestMethod]
+        public void GetEnumeratorFromUsedEnumerator()
+        {
+            string[] arguments = new string[] { "/first", "/second" };
+            ArgumentEnumerator enumerator1 = new ArgumentEnumerator(arguments);
+            ArgumentEnumerator enumerator2 = enumerator1.GetEnumerator();
+            ArgumentEnumerator enumerator3 = enumerator1.GetEnumerator();
+
+            Assert.AreNotEqual(enumerator1, enumerator3);
+            Assert.AreNotEqual(enumerator2, enumerator3);
         }
 
         [TestMethod]

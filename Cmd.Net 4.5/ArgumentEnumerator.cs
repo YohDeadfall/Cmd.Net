@@ -11,11 +11,22 @@ namespace Cmd.Net
     /// </summary>
     public sealed class ArgumentEnumerator : IEnumerable<KeyValuePair<string, string>>, IEnumerator<KeyValuePair<string, string>>
     {
+        #region Nested Types
+
+        private enum State
+        {
+            NotSet,
+            UsedAsEnumerator,
+            Disposed
+        }
+
+        #endregion
+
         #region Fields
 
         private static ArgumentEnumerator empty;
 
-        private bool disposed;
+        private State state;
         private readonly int? threadID;
         private readonly int startIndex;
         private string originalArguments1;
@@ -73,6 +84,7 @@ namespace Cmd.Net
             this.threadID = Thread.CurrentThread.ManagedThreadId;
             this.originalArguments1 = enumerator.originalArguments1;
             this.originalArguments2 = enumerator.originalArguments2;
+            this.arguments = enumerator.arguments;
             this.startIndex = startIndex;
             this.currentIndex = startIndex - 1;
         }
@@ -126,10 +138,10 @@ namespace Cmd.Net
         /// </summary>
         public void Dispose()
         {
-            if (disposed || empty == this)
+            if (state == State.Disposed || empty == this)
             { return; }
 
-            disposed = true;
+            state = State.Disposed;
             originalArguments1 = null;
             originalArguments2 = null;
             arguments = null;
@@ -238,10 +250,10 @@ namespace Cmd.Net
             if (empty == this)
             { return this; }
 
-            if (currentIndex < arguments.Length)
-            { return new ArgumentEnumerator(this, currentIndex); }
-            else
+            if (currentIndex == arguments.Length)
             { return Empty; }
+
+            return new ArgumentEnumerator(this, currentIndex);
         }
 
         /// <summary>
@@ -252,10 +264,18 @@ namespace Cmd.Net
         {
             ThrowIfDisposed();
 
-            if (empty == this || threadID == Thread.CurrentThread.ManagedThreadId)
-            { return this; }
-            else
-            { return new ArgumentEnumerator(this, startIndex); }
+            if (empty == this)
+            {
+                return this;
+            }
+
+            if (state == State.NotSet && threadID == Thread.CurrentThread.ManagedThreadId)
+            {
+                state = State.UsedAsEnumerator;
+                return this;
+            }
+
+            return new ArgumentEnumerator(this, startIndex);
         }
 
         #endregion
@@ -409,7 +429,7 @@ namespace Cmd.Net
 
         private void ThrowIfDisposed()
         {
-            if (disposed)
+            if (state == State.Disposed)
             { throw new ObjectDisposedException(null); }
         }
 
