@@ -9,7 +9,7 @@ namespace Cmd.Net
     /// <summary>
     /// Supports parsing of command-line arguments and iterating over them.
     /// </summary>
-    public sealed class ArgumentEnumerator : IEnumerable<KeyValuePair<string, string>>, IEnumerable, IEnumerator<KeyValuePair<string, string>>, IDisposable, IEnumerator
+    public sealed class ArgumentEnumerator : IEnumerable<KeyValuePair<string, string>>, IEnumerator<KeyValuePair<string, string>>
     {
         #region Fields
 
