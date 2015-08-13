@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cmd.Net.Tests 4.5", "Cmd.Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cmd.Net.Tests 4.0", "Cmd.Net.Tests 4.0\Cmd.Net.Tests 4.0.csproj", "{0BBF18D7-C18B-4BE0-8B80-FC08617F2121}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E4D0CB6-6B18-40A3-AF00-BF15F2FFF992}"
+	ProjectSection(SolutionItems) = preProject
+		Cmd.Net.nuspec = Cmd.Net.nuspec
+		License.txt = License.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
