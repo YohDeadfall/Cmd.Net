@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Cmd.Net</id>
-    <version>1.3</version>
+    <version>1.3.1</version>
     <title>Cmd.Net</title>
     <authors>Yoh Deadfall</authors>
     <owners>Yoh Deadfall</owners>
@@ -18,11 +18,12 @@
       <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
     </frameworkAssemblies>
     <releaseNotes>
-      * 1.3 - Scope uses a name of an entry point assembly to create a new CommandContext.
-              If the error stream is unspecified then the output stream will be used for errors.
-              Properties of CommandContextScope were moved to CommandContext class.
-              ExecuteAll methods are moved to CommandExtensions.
-              ExecuteSingle methods are added to CommandExtensions.
+      * 1.3.1 - Fixed a bug with ArgumentEnumerator.GetEnumerator
+      * 1.3   - Scope uses a name of an entry point assembly to create a new CommandContext.
+                If the error stream is unspecified then the output stream will be used for errors.
+                Properties of CommandContextScope were moved to CommandContext class.
+                ExecuteAll methods are moved to CommandExtensions.
+                ExecuteSingle methods are added to CommandExtensions.
     </releaseNotes>
   </metadata>
   <files>
