@@ -2,9 +2,11 @@
 
 <p>Cmd.Net is a .Net library for building command-line applications with supporting netsh-like contexts and automatic help generation. It provides a convenient and laconic API for working with the command line. The library allows you to forget about parser code writing and to concentrate on the application logic.</p>
 
-<h2>Cmd.Net 1.3</h2>
+<h2>NuGet</h2>
 
-<p>The most recent version is Cmd.Net 1.3. You can download it here or from <a href="https://cmdnet.codeplex.com/">CodePlex</a>.</p>
+<p>To install Cmd.Net, run the following command in the <a href="http://docs.nuget.org/docs/start-here/using-the-package-manager-console">Package Manager Console</a>.</p>
+
+<pre><code>PM> Install-Package Cmd.Net</code></pre>
 
 <h2>Features</h2>
 
