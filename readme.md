@@ -1,34 +1,35 @@
-<h1>Cmd.Net</h1>
+﻿# Cmd.Net
 
-<p>Cmd.Net is a .Net library for building command-line applications with supporting netsh-like contexts and automatic help generation. It provides a convenient and laconic API for working with the command line. The library allows you to forget about parser code writing and to concentrate on the application logic.</p>
+Cmd.Net is a .Net library for building command-line applications with supporting netsh-like contexts and automatic help generation. It provides a convenient and laconic API for working with the command line. The library allows you to forget about parser code writing and to concentrate on the application logic.
 
-<h2>NuGet</h2>
+## NuGet
 
-<p>To install Cmd.Net, run the following command in the <a href="http://docs.nuget.org/docs/start-here/using-the-package-manager-console">Package Manager Console</a>.</p>
+To install Cmd.Net, run the following command in the [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)
 
-<pre><code>PM> Install-Package Cmd.Net</code></pre>
+```powershell
+Install-Package Cmd.Net
+```
 
-<h2>Features</h2>
+## Features
 
-<ol>
-	<li>One command &mdash; one method. No if-else or switch-case needed to determine what shall be done.</li>
-	<li>Running a single command or all commands from user input until the application is over.</li>
-	<li>Argument parsing customization.</li>
-	<li>Creating netsh-like contexts.</li>
-	<li>Automatic help generation.</li>
-</ol>
+1. One command &mdash; one method. No if-else or switch-case needed to determine what shall be done.
+2. Running a single command or all commands from user input until the application is over.
+3. Argument parsing customization.
+4. Creating netsh-like contexts.
+5. Automatic help generation.
 
-<h2>Compatibility</h2>
+## Compatibility
 
-<p>.Net Framework 3.5 and later.</p>
+.Net Framework 3.5 and later.
 
-<h2>Examples</h2>
+## Examples
 
-<h4>Example 1</h4>
+#### Example 1
 
-<p>Command with a description for the help generation and the id parameter custom parsing. The store parameter is optional and its default value is null.</p>
+Command with a description for the help generation and the id parameter custom parsing. The store parameter is optional and its default value is null.
 
-<pre><code>[Verb("copy")]
+```csharp
+[Verb("copy")]
 [Description("Creates a copy of the specified boot entry.")
 public static void CopyBootEntry(
 	[Output] TextWriter output,
@@ -38,20 +39,22 @@ public static void CopyBootEntry(
 	)
 {
 }
-</code></pre>
+```
 
-<pre><code>Creates a copy of the specified boot entry.
+```text
+Creates a copy of the specified boot entry.
 copy id /d:value [/store:value]
   id     Specifies the identifier of the entry to be copied.
   /d     Specifies the description to be applied to the new entry.
   /store Specifies the store to be used. If this option is not specified, the system store is used.
-</code></pre>
+```
 
-<h4>Example 2</h4>
+#### Example 2
 
-<p>Context with child commands and contexts.</p>
+Context with child commands and contexts.
 
-<pre><code>CommandContext rootContext = new CommandContext(
+```csharp
+CommandContext rootContext = new CommandContext(
 	"netsh",
 	new Command(new Action(AddHelper)),
 	new CommandContext(
@@ -66,13 +69,14 @@ copy id /d:value [/store:value]
 		),
 	/* ...*/
 	);
-</code></pre>
+```
 
-<pre><code>netsh&gt;/?
+```text
+netsh>/?
 add          Adds a configuration entry to a list of entries.
 advfirewall  Changes to the 'netsh advfirewall' context.
 ...
-netsh&gt;advfirewall /?
+netsh>advfirewall /?
 consec       Changes to the `netsh advfirewall consec' context.
 ...
-</code></pre>
+```
