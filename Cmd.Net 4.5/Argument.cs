@@ -113,17 +113,6 @@ namespace Cmd.Net
 
                 if (typeConverterType != null && typeof(TypeConverter).IsAssignableFrom(typeConverterType))
                 { typeConverter = (TypeConverter)Activator.CreateInstance(typeConverterType); }
-
-                if (parameterType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(parameterType))
-                {
-                    if (!typeConverter.CanConvertFrom(typeof(IEnumerable<string>)))
-                    { throw new InvalidOperationException(); }
-                }
-                else
-                {
-                    if (!typeConverter.CanConvertFrom(typeof(string)))
-                    { throw new InvalidOperationException(); }
-                }
             }
 
             if (typeConverter == null)
