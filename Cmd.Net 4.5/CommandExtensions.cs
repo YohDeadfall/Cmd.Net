@@ -62,23 +62,23 @@ namespace Cmd.Net
         public static void ExecuteAll(this Command command, TextReader input, TextWriter output, TextWriter error)
         {
             if (command == null)
-            { throw new ArgumentNullException("command"); }
+                throw new ArgumentNullException("command");
 
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             CommandContext commandContext = command as CommandContext;
 
             if (commandContext != null)
-            { ExecuteContext(commandContext, input, output, output, true); }
+                ExecuteContext(commandContext, input, output, output, true);
             else
-            { ExecuteCommand(command, input, output, output, true); }
+                ExecuteCommand(command, input, output, output, true);
         }
 
         /// <summary>
@@ -129,23 +129,23 @@ namespace Cmd.Net
         public static void ExecuteSingle(this Command command, TextReader input, TextWriter output, TextWriter error)
         {
             if (command == null)
-            { throw new ArgumentNullException("command"); }
+                throw new ArgumentNullException("command");
 
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             CommandContext commandContext = command as CommandContext;
 
             if (commandContext != null)
-            { ExecuteContext(commandContext, input, output, output, false); }
+                ExecuteContext(commandContext, input, output, output, false);
             else
-            { ExecuteCommand(command, input, output, output, false); }
+                ExecuteCommand(command, input, output, output, false);
         }
 
         #endregion
@@ -163,14 +163,14 @@ namespace Cmd.Net
                     string arguments = input.ReadLine();
 
                     if (arguments == null)
-                    { break; }
+                        break;
 
                     command.Execute(input, output, error, arguments);
                 }
                 catch (CommandException ex)
                 {
                     if (ex is CommandCanceledException)
-                    { break; }
+                        break;
 
                     Exception exception = ex;
 
@@ -182,7 +182,7 @@ namespace Cmd.Net
                     while (exception != null);
 
                     if (error != output)
-                    { error.WriteLine(); }
+                        error.WriteLine();
                 }
 
                 output.WriteLine();
@@ -205,7 +205,7 @@ namespace Cmd.Net
                         contextEnumeratorMoveNext = contextEnumerator.MoveNext();
 
                         if (contextEnumeratorMoveNext)
-                        { output.Write(' '); }
+                            output.Write(' ');
                     }
 
                     output.Write('>');
@@ -215,7 +215,7 @@ namespace Cmd.Net
                         string arguments = input.ReadLine();
 
                         if (arguments == null)
-                        { break; }
+                            break;
 
                         commandContextScope
                             .CurrentContext
@@ -224,7 +224,7 @@ namespace Cmd.Net
                     catch (CommandException ex)
                     {
                         if (ex is CommandCanceledException)
-                        { break; }
+                            break;
 
                         Exception exception = ex;
 
@@ -236,7 +236,7 @@ namespace Cmd.Net
                         while (exception != null);
 
                         if (error != output)
-                        { error.WriteLine(); }
+                            error.WriteLine();
                     }
 
                     output.WriteLine();

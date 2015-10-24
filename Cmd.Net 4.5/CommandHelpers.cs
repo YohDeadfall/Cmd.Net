@@ -28,7 +28,7 @@ namespace Cmd.Net
         public static void WriteLogo(TextWriter output)
         {
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             AssemblyTitleAttribute assemblyTitleAttribute = (AssemblyTitleAttribute)entryAssembly
@@ -44,9 +44,9 @@ namespace Cmd.Net
             var x = entryAssembly.GetCustomAttributes(false);
 
             if (assemblyTitleAttribute == null)
-            { output.Write(entryAssembly.FullName); }
+                output.Write(entryAssembly.FullName);
             else
-            { output.Write(assemblyTitleAttribute.Title); }
+                output.Write(assemblyTitleAttribute.Title);
 
             output.Write(' ');
             output.Write('[');
@@ -54,14 +54,14 @@ namespace Cmd.Net
             output.Write(' ');
 
             if (assemblyVersionAttribute == null)
-            { output.Write(entryAssembly.GetName().Version); }
+                output.Write(entryAssembly.GetName().Version);
             else
-            { output.Write(assemblyVersionAttribute.Version); }
+                output.Write(assemblyVersionAttribute.Version);
 
             output.WriteLine(']');
 
             if (assemblyCopyrightAttribute != null)
-            { output.WriteLine(assemblyCopyrightAttribute.Copyright.Replace("©", "(c)")); }
+                output.WriteLine(assemblyCopyrightAttribute.Copyright.Replace("©", "(c)"));
 
             output.WriteLine();
         }
@@ -75,25 +75,25 @@ namespace Cmd.Net
             if (!isNullValid)
             {
                 if (value == null)
-                { throw new ArgumentNullException(argumentName); }
+                    throw new ArgumentNullException(argumentName);
 
                 if (value.Length == 0)
-                { throw new ArgumentException(null, argumentName); }
+                    throw new ArgumentException(null, argumentName);
             }
 
             if (!IsValidName(value, isNullValid))
-            { throw new ArgumentException(null, argumentName); }
+                throw new ArgumentException(null, argumentName);
         }
 
         internal static bool IsValidName(string name, bool isNullValid)
         {
             if (string.IsNullOrEmpty(name))
-            { return isNullValid; }
+                return isNullValid;
 
             for (int i = 0; i < name.Length; i++)
             {
                 if (!IsValidNameCharacter(name[i]))
-                { return false; }
+                    return false;
             }
 
             return true;

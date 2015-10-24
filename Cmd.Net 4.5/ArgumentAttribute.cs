@@ -10,7 +10,7 @@ namespace Cmd.Net
     {
         #region Fields
 
-        private readonly string name;
+        private readonly string _name;
 
         #endregion
 
@@ -21,7 +21,7 @@ namespace Cmd.Net
         /// </summary>
         public ArgumentAttribute()
         {
-            this.name = string.Empty;
+            _name = string.Empty;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Cmd.Net
         public ArgumentAttribute(string name)
         {
             CommandHelpers.ValidateName("name", name, true);
-            this.name = name ?? string.Empty;
+            _name = name ?? string.Empty;
         }
 
         #endregion
@@ -48,7 +48,7 @@ namespace Cmd.Net
         /// <value>The name stored in this attribute.</value>
         public string Name
         {
-            get { return name; }
+            get { return _name; }
         }
 
         #endregion

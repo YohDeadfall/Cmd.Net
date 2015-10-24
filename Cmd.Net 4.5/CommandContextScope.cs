@@ -13,12 +13,12 @@ namespace Cmd.Net
         #region Fields
 
         [ThreadStatic]
-        private static CommandContextScope currentScope;
-        private readonly CommandContextScope originalScope;
-        private readonly Thread thread = Thread.CurrentThread;
-        private readonly CommandContext rootContext;
-        private readonly List<CommandContext> contexts;
-        private bool disposed;
+        private static CommandContextScope s_currentScope;
+        private readonly CommandContextScope _originalScope;
+        private readonly Thread _thread;
+        private readonly CommandContext _rootContext;
+        private readonly List<CommandContext> _contexts;
+        private bool _disposed;
 
         #endregion
 
@@ -32,15 +32,15 @@ namespace Cmd.Net
         public CommandContextScope(CommandContext context)
         {
             if (context == null)
-            { throw new ArgumentNullException("context"); }
+                throw new ArgumentNullException("context");
 
-            this.originalScope = currentScope;
-            this.thread = Thread.CurrentThread;
-            this.rootContext = context;
-            this.contexts = new List<CommandContext>();
-            this.contexts.Add(context);
+            _originalScope = s_currentScope;
+            _thread = Thread.CurrentThread;
+            _rootContext = context;
+            _contexts = new List<CommandContext>();
+            _contexts.Add(context);
 
-            currentScope = this;
+            s_currentScope = this;
         }
 
         /// <summary>
@@ -62,19 +62,19 @@ namespace Cmd.Net
         /// </summary>
         public void Dispose()
         {
-            if (disposed)
-            { return; }
+            if (_disposed)
+                return;
 
-            if (thread != Thread.CurrentThread)
-            { throw new InvalidOperationException("InvalidContextScopeThread"); }
+            if (_thread != Thread.CurrentThread)
+                throw new InvalidOperationException("InvalidContextScopeThread");
 
-            if (currentScope != this)
-            { throw new InvalidOperationException("InterleavedContextScopes"); }
+            if (s_currentScope != this)
+                throw new InvalidOperationException("InterleavedContextScopes");
 
-            disposed = true;
-            currentScope = originalScope;
+            _disposed = true;
+            s_currentScope = _originalScope;
 
-            contexts.Clear();
+            _contexts.Clear();
         }
 
         #endregion
@@ -83,17 +83,17 @@ namespace Cmd.Net
 
         internal static CommandContextScope Current
         {
-            get { return currentScope; }
+            get { return s_currentScope; }
         }
 
         internal CommandContext RootContext
         {
-            get { return rootContext; }
+            get { return _rootContext; }
         }
 
         internal CommandContext CurrentContext
         {
-            get { return contexts[contexts.Count - 1]; }
+            get { return _contexts[_contexts.Count - 1]; }
         }
 
         #endregion
@@ -102,25 +102,25 @@ namespace Cmd.Net
 
         internal IEnumerator<CommandContext> GetContextEnumerator()
         {
-            return contexts.GetEnumerator();
+            return _contexts.GetEnumerator();
         }
 
         internal CommandContext PopContext()
         {
-            int index = contexts.Count;
+            int index = _contexts.Count;
 
             if (index > 1)
-            { contexts.RemoveAt(--index); }
+                _contexts.RemoveAt(--index);
 
-            return contexts[--index];
+            return _contexts[--index];
         }
 
         internal void PushContext(CommandContext context)
         {
             if (context == null)
-            { throw new ArgumentNullException("context"); }
-            
-            contexts.Add(context);
+                throw new ArgumentNullException("context");
+
+            _contexts.Add(context);
         }
 
         #endregion
@@ -142,7 +142,7 @@ namespace Cmd.Net
                 if (CommandHelpers.IsValidNameCharacter(ch))
                 {
                     if (defaultContextName != null)
-                    { defaultContextName[i] = ch; }
+                        defaultContextName[i] = ch;
 
                     continue;
                 }

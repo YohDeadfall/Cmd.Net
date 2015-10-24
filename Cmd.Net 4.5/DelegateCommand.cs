@@ -20,14 +20,14 @@ namespace Cmd.Net
         {
             #region Fields
 
-            private readonly TextReader reader;
-            private readonly TextWriter writer;
-            private readonly Encoder encoder;
-            private readonly Decoder decoder;
-            private readonly char[] bufferRead;
-            private readonly char[] bufferWrite;
-            private int bufferReadPosition;
-            private int bufferReadLength;
+            private readonly TextReader _reader;
+            private readonly TextWriter _writer;
+            private readonly Encoder _encoder;
+            private readonly Decoder _decoder;
+            private readonly char[] _bufferRead;
+            private readonly char[] _bufferWrite;
+            private int _bufferReadPosition;
+            private int _bufferReadLength;
 
             #endregion
 
@@ -38,16 +38,16 @@ namespace Cmd.Net
                 StreamReader streamReader = reader as StreamReader;
                 StreamWriter streamWriter = writer as StreamWriter;
 
-                this.reader = reader;
-                this.writer = writer;
-                this.encoder = (streamReader == null)
+                _reader = reader;
+                _writer = writer;
+                _encoder = (streamReader == null)
                     ? Encoding.Default.GetEncoder()
                     : streamReader.CurrentEncoding.GetEncoder();
-                this.decoder = (streamWriter == null)
+                _decoder = (streamWriter == null)
                     ? Encoding.Default.GetDecoder()
                     : streamWriter.Encoding.GetDecoder();
-                this.bufferRead = new char[256];
-                this.bufferWrite = new char[256];
+                _bufferRead = new char[256];
+                _bufferWrite = new char[256];
             }
 
             #endregion
@@ -87,39 +87,39 @@ namespace Cmd.Net
             public override int Read(byte[] buffer, int offset, int count)
             {
                 if (buffer == null)
-                { throw new ArgumentNullException("buffer"); }
+                    throw new ArgumentNullException("buffer");
 
                 if (offset < 0 || offset >= buffer.Length)
-                { throw new ArgumentException("offset"); }
+                    throw new ArgumentException("offset");
 
                 if (count < 0 || offset + count > buffer.Length)
-                { throw new ArgumentOutOfRangeException("count"); }
+                    throw new ArgumentOutOfRangeException("count");
 
                 int readBytes = 0;
 
                 while (count > 0)
                 {
                     int byteCount;
-                    int charCount = bufferReadLength;
+                    int charCount = _bufferReadLength;
 
-                    if (bufferReadLength == 0)
+                    if (_bufferReadLength == 0)
                     {
-                        bufferReadLength = reader.Read(bufferRead, 0, bufferRead.Length);
+                        _bufferReadLength = _reader.Read(_bufferRead, 0, _bufferRead.Length);
 
-                        if (bufferReadLength == 0)
-                        { return readBytes; }
+                        if (_bufferReadLength == 0)
+                            return readBytes;
                     }
 
                     for (
-                        byteCount = encoder.GetByteCount(bufferRead, bufferReadPosition, charCount, false);
+                        byteCount = _encoder.GetByteCount(_bufferRead, _bufferReadPosition, charCount, false);
                         byteCount > count;
-                        byteCount = encoder.GetByteCount(bufferRead, bufferReadPosition, charCount--, false)
+                        byteCount = _encoder.GetByteCount(_bufferRead, _bufferReadPosition, charCount--, false)
                         ) ;
 
-                    encoder.GetBytes(bufferRead, bufferReadPosition, charCount, buffer, offset, false);
+                    _encoder.GetBytes(_bufferRead, _bufferReadPosition, charCount, buffer, offset, false);
 
-                    bufferReadPosition += charCount;
-                    bufferReadLength -= charCount;
+                    _bufferReadPosition += charCount;
+                    _bufferReadLength -= charCount;
                     offset += byteCount;
                     count -= byteCount;
                     readBytes += byteCount;
@@ -130,24 +130,24 @@ namespace Cmd.Net
 
             public override long Seek(long offset, SeekOrigin origin)
             {
-                throw new NotSupportedException("UnseekableStream"); 
+                throw new NotSupportedException("UnseekableStream");
             }
 
             public override void SetLength(long value)
             {
-                throw new NotSupportedException("UnseekableStream"); 
+                throw new NotSupportedException("UnseekableStream");
             }
 
             public override void Write(byte[] buffer, int offset, int count)
             {
                 if (buffer == null)
-                { throw new ArgumentNullException("buffer"); }
+                    throw new ArgumentNullException("buffer");
 
                 if (offset < 0 || offset >= buffer.Length)
-                { throw new ArgumentException("offset"); }
+                    throw new ArgumentException("offset");
 
                 if (count < 0 || offset + count > buffer.Length)
-                { throw new ArgumentOutOfRangeException("count"); }
+                    throw new ArgumentOutOfRangeException("count");
 
                 while (count > 0)
                 {
@@ -155,13 +155,13 @@ namespace Cmd.Net
                     int charCount;
 
                     for (
-                        charCount = decoder.GetCharCount(buffer, offset, byteCount, false);
-                        charCount > bufferWrite.Length;
-                        charCount = decoder.GetCharCount(buffer, offset, byteCount--, false)
+                        charCount = _decoder.GetCharCount(buffer, offset, byteCount, false);
+                        charCount > _bufferWrite.Length;
+                        charCount = _decoder.GetCharCount(buffer, offset, byteCount--, false)
                         ) ;
 
-                    decoder.GetChars(buffer, offset, count, bufferWrite, charCount, false);
-                    writer.Write(bufferWrite, 0, charCount);
+                    _decoder.GetChars(buffer, offset, count, _bufferWrite, charCount, false);
+                    _writer.Write(_bufferWrite, 0, charCount);
 
                     offset += byteCount;
                     count -= byteCount;
@@ -189,8 +189,8 @@ namespace Cmd.Net
 
         #region Fields
 
-        private readonly Dictionary<string, Argument> arguments;
-        private readonly Delegate method;
+        private readonly Dictionary<string, Argument> _arguments;
+        private readonly Delegate _method;
 
         #endregion
 
@@ -239,18 +239,18 @@ namespace Cmd.Net
             : base(name, description)
         {
             if (method == null)
-            { throw new ArgumentNullException("method"); }
+                throw new ArgumentNullException("method");
 
             MethodInfo methodInfo = method.Method;
             ParameterInfo[] parameterInfos = methodInfo.GetParameters();
 
-            this.arguments = new Dictionary<string, Argument>(StringComparer.OrdinalIgnoreCase);
-            this.method = method;
+            _arguments = new Dictionary<string, Argument>(StringComparer.OrdinalIgnoreCase);
+            _method = method;
 
             foreach (ParameterInfo parameterInfo in methodInfo.GetParameters())
             {
                 Argument argument = new Argument(parameterInfo);
-                arguments.Add(argument.ArgumentName, argument);
+                _arguments.Add(argument.ArgumentName, argument);
             }
         }
 
@@ -262,9 +262,9 @@ namespace Cmd.Net
         protected override void ExecuteCore(TextReader input, TextWriter output, TextWriter error, ArgumentEnumerator args)
         {
             if (args.MoveNext() && string.CompareOrdinal(args.CurrentName, "?") == 0)
-            { ExecuteHelp(output); }
+                ExecuteHelp(output);
             else
-            { ExecuteMethod(input, output, error, args); }
+                ExecuteMethod(input, output, error, args);
         }
 
         #endregion
@@ -277,7 +277,7 @@ namespace Cmd.Net
         /// <value>The <see cref="T:System.Delegate" /> that represents the invoked method.</value>
         public Delegate Method
         {
-            get { return method; }
+            get { return _method; }
         }
 
         #endregion
@@ -287,7 +287,7 @@ namespace Cmd.Net
         private static string GetCommandName(Delegate method)
         {
             if (method == null)
-            { return null; }
+                return null;
 
             VerbAttribute verbAttribute = (VerbAttribute)method.Method
                 .GetCustomAttributes(typeof(VerbAttribute), true)
@@ -301,7 +301,7 @@ namespace Cmd.Net
         private static string GetCommandDescription(Delegate method)
         {
             if (method == null)
-            { return null; }
+                return null;
 
             DescriptionAttribute descriptionAttribute = (DescriptionAttribute)method.Method
                 .GetCustomAttributes(typeof(DescriptionAttribute), true)
@@ -325,19 +325,21 @@ namespace Cmd.Net
             output.Write('/');
             output.Write(Name);
 
-            IEnumerable<Argument> orderedArguments = (arguments.Count > 0)
-                ? arguments.Values.OrderBy((a) => a.Position).ToArray()
+            IEnumerable<Argument> orderedArguments = (_arguments.Count > 0)
+                ? _arguments.Values.OrderBy((a) => a.Position).ToArray()
                 : Enumerable.Empty<Argument>();
 
             foreach (Argument argument in orderedArguments)
             {
                 if (argument.IsInput || argument.IsOutput || argument.IsError)
-                { continue; }
+                    continue;
 
                 output.Write(' ');
 
                 if (!argument.IsRequired)
-                { output.Write('['); }
+                {
+                    output.Write('[');
+                }
 
                 if (argument.ArgumentName.Length == 0)
                 {
@@ -367,7 +369,7 @@ namespace Cmd.Net
                                 nameEnumeratorMoveNext = nameEnumerator.MoveNext();
 
                                 if (nameEnumeratorMoveNext)
-                                { output.Write('|'); }
+                                    output.Write('|');
                             }
 
                             output.Write('}');
@@ -385,15 +387,15 @@ namespace Cmd.Net
                     output.Write('[');
 
                     if (argument.ArgumentName.Length == 0)
-                    { output.Write(argument.ParameterName); }
+                        output.Write(argument.ParameterName);
                     else
-                    { output.Write(argument.ArgumentName); }
+                        output.Write(argument.ArgumentName);
 
                     output.Write(']');
                 }
 
                 if (!argument.IsRequired)
-                { output.Write(']'); }
+                    output.Write(']');
             }
 
             output.WriteLine();
@@ -401,26 +403,28 @@ namespace Cmd.Net
 
             int argumentNameMaxLength = 0;
 
-            if (arguments.Count == 0)
-            { return; }
+            if (_arguments.Count == 0)
+            {
+                return;
+            }
 
             foreach (Argument argument in orderedArguments)
             {
                 if (argument.IsInput || argument.IsOutput || argument.IsError)
-                { continue; }
+                    continue;
 
                 int argumentNameLength = (argument.ArgumentName.Length == 0)
                     ? argument.ParameterName.Length
                     : argument.ArgumentName.Length;
 
                 if (argumentNameLength > argumentNameMaxLength)
-                { argumentNameMaxLength = argumentNameLength; }
+                    argumentNameMaxLength = argumentNameLength;
             }
 
             foreach (Argument argument in orderedArguments)
             {
                 if (argument.IsInput || argument.IsOutput || argument.IsError)
-                { continue; }
+                    continue;
 
                 int argumentNameLength = argument.ArgumentName.Length;
 
@@ -444,14 +448,14 @@ namespace Cmd.Net
                 if (argumentNameLength < 12)
                 {
                     for (int i = argumentNameMaxLength - argumentNameLength; i >= 0; i--)
-                    { output.Write(' '); }
+                        output.Write(' ');
                 }
                 else
                 {
                     output.WriteLine();
 
                     for (int i = argumentNameMaxLength; i >= 0; i--)
-                    { output.Write(' '); }
+                        output.Write(' ');
                 }
 
                 output.WriteLine(argument.Description);
@@ -465,39 +469,39 @@ namespace Cmd.Net
             object[] parameterValues = ParseArguments(args, error);
             Stream inOutStream = null;
 
-            foreach (Argument argument in arguments.Values)
+            foreach (Argument argument in _arguments.Values)
             {
                 if (argument.IsInput && argument.IsOutput)
                 {
                     if (inOutStream == null)
-                    { inOutStream = InOutStream.Create(input, output); }
+                        inOutStream = InOutStream.Create(input, output);
 
                     parameterValues[argument.Position] = inOutStream;
                 }
                 else
                 {
                     if (argument.IsInput)
-                    { parameterValues[argument.Position] = input; }
+                        parameterValues[argument.Position] = input;
 
                     if (argument.IsOutput)
-                    { parameterValues[argument.Position] = output; }
+                        parameterValues[argument.Position] = output;
                 }
 
                 if (argument.IsError)
-                { parameterValues[argument.Position] = error; }
+                    parameterValues[argument.Position] = error;
             }
 
             try
             {
-                method.DynamicInvoke(parameterValues);
+                _method.DynamicInvoke(parameterValues);
             }
             catch (Exception ex)
             {
                 if (ex.InnerException != null && ex is TargetInvocationException)
-                { ex = ex.InnerException; }
+                    ex = ex.InnerException;
 
                 if (ex is CommandCanceledException)
-                { throw ex; }
+                    throw ex;
 
                 ThrowHelper.ThrowCommandExecutionException(Name, ex);
             }
@@ -505,57 +509,69 @@ namespace Cmd.Net
 
         private object[] ParseArguments(ArgumentEnumerator args, TextWriter error)
         {
-            object[] parameterValues = new object[arguments.Count];
+            object[] parameterValues = new object[_arguments.Count];
 
             for (int i = 0; i < parameterValues.Length; i++)
-            { parameterValues[i] = Type.Missing; }
+                parameterValues[i] = Type.Missing;
 
             foreach (IGrouping<string, string> argumentValue in args.GroupBy((i) => i.Key, (i) => i.Value))
             {
                 Argument argument;
 
-                if (!arguments.TryGetValue(argumentValue.Key, out argument))
-                { ThrowHelper.ThrowUnknownArgumentException(Name, argumentValue.Key); }
+                if (!_arguments.TryGetValue(argumentValue.Key, out argument))
+                    ThrowHelper.ThrowUnknownArgumentException(Name, argumentValue.Key);
 
                 int argumentValueCount = argumentValue.Count();
 
                 if (argument.AreMultipleAllowed)
                 {
                     if (argument.Type.IsAssignableFrom(typeof(IEnumerable<string>)))
-                    { parameterValues[argument.Position] = argumentValue; }
+                    {
+                        parameterValues[argument.Position] = argumentValue;
+                    }
                     else
                     {
                         try
-                        { parameterValues[argument.Position] = argument.TypeConverter.ConvertFrom(argumentValue); }
+                        {
+                            parameterValues[argument.Position] = argument.TypeConverter.ConvertFrom(argumentValue);
+                        }
                         catch (Exception ex)
-                        { ThrowHelper.ThrowCanNotParseArgumentValueException(Name, argument.DisplayName, argument.Type, ex); }
+                        {
+                            ThrowHelper.ThrowCanNotParseArgumentValueException(Name, argument.DisplayName, argument.Type, ex);
+                        }
                     }
                 }
                 else
                 {
                     if (argumentValueCount > 1)
-                    { ThrowHelper.ThrowTooManyValuesForArgumentException(Name, argument.DisplayName); }
+                        ThrowHelper.ThrowTooManyValuesForArgumentException(Name, argument.DisplayName);
 
                     if (argument.Type.IsAssignableFrom(typeof(string)))
-                    { parameterValues[argument.Position] = argumentValue.First().ToString(); }
+                    {
+                        parameterValues[argument.Position] = argumentValue.First().ToString();
+                    }
                     else
                     {
                         try
-                        { parameterValues[argument.Position] = argument.TypeConverter.ConvertFrom(argumentValue.First()); }
+                        {
+                            parameterValues[argument.Position] = argument.TypeConverter.ConvertFrom(argumentValue.First());
+                        }
                         catch (Exception ex)
-                        { ThrowHelper.ThrowCanNotParseArgumentValueException(Name, argument.DisplayName, argument.Type, ex); }
+                        {
+                            ThrowHelper.ThrowCanNotParseArgumentValueException(Name, argument.DisplayName, argument.Type, ex);
+                        }
                     }
                 }
             }
 
-            foreach (Argument argument in arguments.Values)
+            foreach (Argument argument in _arguments.Values)
             {
                 if (!(argument.IsInput || argument.IsOutput || argument.IsError) && parameterValues[argument.Position] == Type.Missing)
                 {
                     if (argument.IsRequired)
-                    { ThrowHelper.ThrowRequiredArgumentException(Name, argument.DisplayName); }
-                    else
-                    { parameterValues[argument.Position] = argument.DefaultValue; }
+                        ThrowHelper.ThrowRequiredArgumentException(Name, argument.DisplayName);
+
+                    parameterValues[argument.Position] = argument.DefaultValue;
                 }
             }
 

@@ -28,14 +28,14 @@ namespace Cmd.Net
 
         #region Fields
 
-        private readonly string argumentName;
-        private readonly string parameterName;
-        private readonly string description;
-        private readonly int position;
-        private readonly Flags flags;
-        private readonly Type type;
-        private readonly TypeConverter typeConverter;
-        private readonly object defaultValue;
+        private readonly string _argumentName;
+        private readonly string _parameterName;
+        private readonly string _description;
+        private readonly int _position;
+        private readonly Flags _flags;
+        private readonly Type _type;
+        private readonly TypeConverter _typeConverter;
+        private readonly object _defaultValue;
 
         #endregion
 
@@ -45,35 +45,35 @@ namespace Cmd.Net
         {
             Type parameterType = parameterInfo.ParameterType;
 
-            SetFlag(ref this.flags, Flags.IsInput, parameterInfo.GetCustomAttributes(typeof(InputAttribute), true).Length > 0);
-            SetFlag(ref this.flags, Flags.IsOutput, parameterInfo.GetCustomAttributes(typeof(OutputAttribute), true).Length > 0);
-            SetFlag(ref this.flags, Flags.IsError, parameterInfo.GetCustomAttributes(typeof(ErrorAttribute), true).Length > 0);
+            SetFlag(ref _flags, Flags.IsInput, parameterInfo.GetCustomAttributes(typeof(InputAttribute), true).Length > 0);
+            SetFlag(ref _flags, Flags.IsOutput, parameterInfo.GetCustomAttributes(typeof(OutputAttribute), true).Length > 0);
+            SetFlag(ref _flags, Flags.IsError, parameterInfo.GetCustomAttributes(typeof(ErrorAttribute), true).Length > 0);
 
-            if (this.IsInput)
+            if (IsInput)
             {
-                if (this.IsOutput || this.IsError)
+                if (IsOutput || IsError)
                 {
-                    if (this.IsOutput == this.IsError)
-                    { throw new InvalidOperationException(); }
+                    if (IsOutput == IsError)
+                        throw new InvalidOperationException();
 
                     if (!parameterType.IsAssignableFrom(typeof(Stream)))
-                    { throw new InvalidOperationException(); }
+                        throw new InvalidOperationException();
                 }
                 else
                 {
                     if (!parameterType.IsAssignableFrom(typeof(TextReader)))
-                    { throw new InvalidOperationException(); }
+                        throw new InvalidOperationException();
                 }
             }
             else
             {
-                if (this.IsOutput || this.IsError)
+                if (IsOutput || IsError)
                 {
-                    if (this.IsOutput == this.IsError)
-                    { throw new InvalidOperationException(); }
+                    if (IsOutput == IsError)
+                        throw new InvalidOperationException();
 
                     if (!parameterType.IsAssignableFrom(typeof(TextWriter)))
-                    { throw new InvalidOperationException(); }
+                        throw new InvalidOperationException();
                 }
             }
 
@@ -81,22 +81,22 @@ namespace Cmd.Net
                 .GetCustomAttributes(typeof(ArgumentAttribute), true)
                 .FirstOrDefault();
 
-            if (this.IsInput || this.IsOutput || this.IsError)
+            if (IsInput || IsOutput || IsError)
             {
                 if (argumentAttribute != null)
-                { throw new InvalidOperationException(); }
+                    throw new InvalidOperationException();
 
-                this.argumentName = parameterInfo.Name;
-                this.parameterName = parameterInfo.Name;
-                this.description = null;
-                this.position = parameterInfo.Position;
+                _argumentName = parameterInfo.Name;
+                _parameterName = parameterInfo.Name;
+                _description = null;
+                _position = parameterInfo.Position;
 
-                SetFlag(ref this.flags, Flags.IsRequired, true);
-                SetFlag(ref this.flags, Flags.AreMultipleAllowed, false);
+                SetFlag(ref _flags, Flags.IsRequired, true);
+                SetFlag(ref _flags, Flags.AreMultipleAllowed, false);
 
-                this.type = parameterType;
-                this.typeConverter = null;
-                this.defaultValue = null;
+                _type = parameterType;
+                _typeConverter = null;
+                _defaultValue = null;
 
                 return;
             }
@@ -112,7 +112,7 @@ namespace Cmd.Net
                 Type typeConverterType = Type.GetType(typeConverterAttribute.ConverterTypeName);
 
                 if (typeConverterType != null && typeof(TypeConverter).IsAssignableFrom(typeConverterType))
-                { typeConverter = (TypeConverter)Activator.CreateInstance(typeConverterType); }
+                    typeConverter = (TypeConverter)Activator.CreateInstance(typeConverterType);
             }
 
             if (typeConverter == null)
@@ -125,41 +125,41 @@ namespace Cmd.Net
             if (isCollectionArgument)
             {
                 if (!typeConverter.CanConvertFrom(typeof(IEnumerable<string>)))
-                { throw new InvalidOperationException(); }
+                    throw new InvalidOperationException();
             }
             else
             {
                 if (!typeConverter.CanConvertFrom(typeof(string)))
-                { throw new InvalidOperationException(); }
+                    throw new InvalidOperationException();
             }
 
             DescriptionAttribute descriptionAttribute = (DescriptionAttribute)parameterInfo
                 .GetCustomAttributes(typeof(DescriptionAttribute), true)
                 .FirstOrDefault();
 
-            this.argumentName = (argumentAttribute != null)
+            _argumentName = (argumentAttribute != null)
                 ? argumentAttribute.Name
                 : string.Empty;
-            this.parameterName = parameterInfo.Name;
-            this.description = (descriptionAttribute != null)
+            _parameterName = parameterInfo.Name;
+            _description = (descriptionAttribute != null)
                 ? descriptionAttribute.Description
                 : null;
-            this.position = parameterInfo.Position;
+            _position = parameterInfo.Position;
 
             SetFlag(
-                ref this.flags,
+                ref _flags,
                 Flags.IsRequired,
                 !parameterInfo.IsOptional
                 );
             SetFlag(
-                ref this.flags,
+                ref _flags,
                 Flags.AreMultipleAllowed,
                 isCollectionArgument || parameterType.IsEnum && parameterType.IsDefined(typeof(FlagsAttribute), false)
                 );
 
-            this.type = parameterType;
-            this.typeConverter = typeConverter;
-            this.defaultValue = parameterInfo.DefaultValue;
+            _type = parameterType;
+            _typeConverter = typeConverter;
+            _defaultValue = parameterInfo.DefaultValue;
         }
 
         #endregion
@@ -168,27 +168,27 @@ namespace Cmd.Net
 
         internal string ArgumentName
         {
-            get { return argumentName; }
+            get { return _argumentName; }
         }
 
         internal string ParameterName
         {
-            get { return parameterName; }
+            get { return _parameterName; }
         }
 
         internal string DisplayName
         {
-            get { return (argumentName.Length == 0) ? parameterName : argumentName; }
+            get { return (_argumentName.Length == 0) ? _parameterName : _argumentName; }
         }
 
         internal string Description
         {
-            get { return description; }
+            get { return _description; }
         }
 
         internal int Position
         {
-            get { return position; }
+            get { return _position; }
         }
 
         internal bool IsRequired
@@ -218,17 +218,17 @@ namespace Cmd.Net
 
         internal Type Type
         {
-            get { return type; }
+            get { return _type; }
         }
 
         internal TypeConverter TypeConverter
         {
-            get { return typeConverter; }
+            get { return _typeConverter; }
         }
 
         internal object DefaultValue
         {
-            get { return defaultValue; }
+            get { return _defaultValue; }
         }
 
         #endregion
@@ -237,15 +237,15 @@ namespace Cmd.Net
 
         private bool GetFlag(Flags requiredFlags)
         {
-            return (flags & requiredFlags) == requiredFlags;
+            return (_flags & requiredFlags) == requiredFlags;
         }
 
         private static void SetFlag(ref Flags flags, Flags requiredFlags, bool value)
         {
             if (value)
-            { flags |= requiredFlags; }
+                flags |= requiredFlags;
             else
-            { flags &= ~requiredFlags; }
+                flags &= ~requiredFlags;
         }
 
         #endregion

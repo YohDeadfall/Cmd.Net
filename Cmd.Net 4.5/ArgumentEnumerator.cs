@@ -24,16 +24,16 @@ namespace Cmd.Net
 
         #region Fields
 
-        private static ArgumentEnumerator empty;
+        private static ArgumentEnumerator s_empty;
 
-        private State state;
-        private readonly int? threadID;
-        private readonly int startIndex;
-        private string originalArguments1;
-        private string[] originalArguments2;
-        private KeyValuePair<string, string>[] arguments;
-        private KeyValuePair<string, string> current;
-        private int currentIndex;
+        private State _state;
+        private readonly int? _threadID;
+        private readonly int _startIndex;
+        private string _originalArguments1;
+        private string[] _originalArguments2;
+        private KeyValuePair<string, string>[] _arguments;
+        private KeyValuePair<string, string> _current;
+        private int _currentIndex;
 
         #endregion
 
@@ -48,11 +48,11 @@ namespace Cmd.Net
         public ArgumentEnumerator(string arguments)
         {
             if (arguments == null)
-            { throw new ArgumentNullException("arguments"); }
+                throw new ArgumentNullException("arguments");
 
-            this.threadID = Thread.CurrentThread.ManagedThreadId;
-            this.originalArguments1 = arguments;
-            this.currentIndex = -1;
+            _threadID = Thread.CurrentThread.ManagedThreadId;
+            _originalArguments1 = arguments;
+            _currentIndex = -1;
         }
 
         /// <summary>
@@ -64,29 +64,29 @@ namespace Cmd.Net
         public ArgumentEnumerator(params string[] arguments)
         {
             if (arguments == null)
-            { throw new ArgumentNullException("arguments"); }
+                throw new ArgumentNullException("arguments");
 
-            this.threadID = Thread.CurrentThread.ManagedThreadId;
-            this.originalArguments2 = arguments;
-            this.currentIndex = -1;
+            _threadID = Thread.CurrentThread.ManagedThreadId;
+            _originalArguments2 = arguments;
+            _currentIndex = -1;
         }
 
         private ArgumentEnumerator()
         {
-            this.arguments = new KeyValuePair<string, string>[0];
-            this.currentIndex = -1;
+            _arguments = new KeyValuePair<string, string>[0];
+            _currentIndex = -1;
         }
 
         private ArgumentEnumerator(ArgumentEnumerator enumerator, int startIndex)
         {
             enumerator.ParseArguments();
 
-            this.threadID = Thread.CurrentThread.ManagedThreadId;
-            this.originalArguments1 = enumerator.originalArguments1;
-            this.originalArguments2 = enumerator.originalArguments2;
-            this.arguments = enumerator.arguments;
-            this.startIndex = startIndex;
-            this.currentIndex = startIndex - 1;
+            _threadID = Thread.CurrentThread.ManagedThreadId;
+            _originalArguments1 = enumerator._originalArguments1;
+            _originalArguments2 = enumerator._originalArguments2;
+            _arguments = enumerator._arguments;
+            _startIndex = startIndex;
+            _currentIndex = startIndex - 1;
         }
 
         #endregion
@@ -122,10 +122,10 @@ namespace Cmd.Net
             {
                 ThrowIfDisposed();
 
-                if (currentIndex < startIndex || currentIndex >= arguments.Length)
-                { throw new InvalidOperationException(); }
+                if (_currentIndex < _startIndex || _currentIndex >= _arguments.Length)
+                    throw new InvalidOperationException();
 
-                return current;
+                return _current;
             }
         }
 
@@ -138,16 +138,16 @@ namespace Cmd.Net
         /// </summary>
         public void Dispose()
         {
-            if (state == State.Disposed || empty == this)
-            { return; }
+            if (_state != State.Disposed && s_empty != this)
+            {
+                _state = State.Disposed;
+                _originalArguments1 = null;
+                _originalArguments2 = null;
+                _arguments = null;
+                _current = default(KeyValuePair<string, string>);
 
-            state = State.Disposed;
-            originalArguments1 = null;
-            originalArguments2 = null;
-            arguments = null;
-            current = default(KeyValuePair<string, string>);
-
-            GC.SuppressFinalize(this);
+                GC.SuppressFinalize(this);
+            }
         }
 
         #endregion
@@ -169,19 +169,19 @@ namespace Cmd.Net
             ThrowIfDisposed();
             ParseArguments();
 
-            if (currentIndex == arguments.Length)
-            { return false; }
+            if (_currentIndex == _arguments.Length)
+                return false;
 
-            currentIndex++;
+            _currentIndex++;
 
-            if (currentIndex == arguments.Length)
+            if (_currentIndex == _arguments.Length)
             {
-                current = new KeyValuePair<string, string>();
+                _current = new KeyValuePair<string, string>();
                 return false;
             }
             else
             {
-                current = arguments[currentIndex];
+                _current = _arguments[_currentIndex];
                 return true;
             }
         }
@@ -194,8 +194,8 @@ namespace Cmd.Net
         {
             ThrowIfDisposed();
 
-            current = new KeyValuePair<string, string>();
-            currentIndex = startIndex - 1;
+            _current = new KeyValuePair<string, string>();
+            _currentIndex = _startIndex - 1;
         }
 
         #endregion
@@ -208,7 +208,7 @@ namespace Cmd.Net
         /// <value>An empty <see cref="T:Cmd.Net.ArgumentEnumerator" />.</value>
         public static ArgumentEnumerator Empty
         {
-            get { return empty ?? (empty = new ArgumentEnumerator()); }
+            get { return s_empty ?? (s_empty = new ArgumentEnumerator()); }
         }
 
         /// <summary>
@@ -247,13 +247,13 @@ namespace Cmd.Net
         {
             ThrowIfDisposed();
 
-            if (empty == this)
-            { return this; }
+            if (s_empty == this)
+                return this;
 
-            if (currentIndex == arguments.Length)
-            { return Empty; }
+            if (_currentIndex == _arguments.Length)
+                return Empty;
 
-            return new ArgumentEnumerator(this, currentIndex);
+            return new ArgumentEnumerator(this, _currentIndex);
         }
 
         /// <summary>
@@ -264,18 +264,18 @@ namespace Cmd.Net
         {
             ThrowIfDisposed();
 
-            if (empty == this)
+            if (s_empty == this)
             {
                 return this;
             }
 
-            if (state == State.NotSet && threadID == Thread.CurrentThread.ManagedThreadId)
+            if (_state == State.NotSet && _threadID == Thread.CurrentThread.ManagedThreadId)
             {
-                state = State.UsedAsEnumerator;
+                _state = State.UsedAsEnumerator;
                 return this;
             }
 
-            return new ArgumentEnumerator(this, startIndex);
+            return new ArgumentEnumerator(this, _startIndex);
         }
 
         #endregion
@@ -300,12 +300,12 @@ namespace Cmd.Net
                 while (true)
                 {
                     if (endIndex == argument.Length)
-                    { throw new InvalidOperationException(); }
+                        throw new InvalidOperationException();
 
                     if (argument[endIndex] == '"' && (++endIndex == argument.Length || argument[endIndex] != '"'))
-                    { break; }
+                        break;
                     else
-                    { endIndex++; }
+                        endIndex++;
                 }
 
                 endIndexLocal = endIndex - 1;
@@ -340,14 +340,14 @@ namespace Cmd.Net
                     ) ;
 
                 if (c == ':')
-                { delimiterIndex = endIndex; }
+                    delimiterIndex = endIndex;
 
                 if (argument[startIndex] == '-')
                 {
                     startIndex++;
 
                     if (delimiterIndex != -1)
-                    { throw new InvalidOperationException(); }
+                        throw new InvalidOperationException();
 
                     return new KeyValuePair<string, string>(
                         argument.Substring(startIndex, endIndex - startIndex),
@@ -393,10 +393,10 @@ namespace Cmd.Net
                     ) ;
 
                 if (startIndex == arguments.Length)
-                { break; }
+                    break;
 
                 if (result == null)
-                { result = new LinkedList<KeyValuePair<string, string>>(); }
+                    result = new LinkedList<KeyValuePair<string, string>>();
 
                 result.AddLast(ParseArgument(arguments, startIndex, out endIndex, false));
             }
@@ -412,25 +412,25 @@ namespace Cmd.Net
             int endIndex;
 
             for (int i = 0; i < arguments.Length; i++)
-            { result[i] = ParseArgument(arguments[i], 0, out endIndex, true); }
+                result[i] = ParseArgument(arguments[i], 0, out endIndex, true);
 
             return result;
         }
 
         private void ParseArguments()
         {
-            if (arguments == null)
+            if (_arguments == null)
             {
-                arguments = (originalArguments1 == null)
-                    ? ParseArguments(originalArguments2)
-                    : ParseArguments(originalArguments1);
+                _arguments = (_originalArguments1 == null)
+                    ? ParseArguments(_originalArguments2)
+                    : ParseArguments(_originalArguments1);
             }
         }
 
         private void ThrowIfDisposed()
         {
-            if (state == State.Disposed)
-            { throw new ObjectDisposedException(null); }
+            if (_state == State.Disposed)
+                throw new ObjectDisposedException(null);
         }
 
         #endregion

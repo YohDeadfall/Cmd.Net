@@ -12,7 +12,8 @@ namespace Cmd.Net
         #region Fields
 
         private const int MaxCommandName = 13;
-        private readonly CommandCollection commands = new CommandCollection();
+
+        private readonly CommandCollection _commands = new CommandCollection();
 
         #endregion
 
@@ -32,11 +33,11 @@ namespace Cmd.Net
         public CommandContext(string name, params Command[] commands)
             : base(name)
         {
-            if (commands == null)
-            { return; }
-
-            foreach (Command command in commands)
-            { this.commands.Add(command); }
+            if (commands != null)
+            {
+                foreach (Command command in commands)
+                    _commands.Add(command);
+            }
         }
 
         /// <summary>
@@ -54,11 +55,11 @@ namespace Cmd.Net
         public CommandContext(string name, string description, params Command[] commands)
             : base(name, description)
         {
-            if (commands == null)
-            { return; }
-
-            foreach (Command command in commands)
-            { this.commands.Add(command); }
+            if (commands != null)
+            {
+                foreach (Command command in commands)
+                    _commands.Add(command);
+            }
         }
 
         #endregion
@@ -72,24 +73,32 @@ namespace Cmd.Net
             CommandContext commandContext = this;
 
             if (!args.MoveNext())
-            { return; }
+            {
+                return;
+            }
 
             CommandContextScope executionScope = CommandContextScope.Current;
 
             if (executionScope != null && executionScope.CurrentContext != this)
-            { ThrowHelper.ThrowNotCurrentCommandContextException(Name); }
+            {
+                ThrowHelper.ThrowNotCurrentCommandContextException(Name);
+            }
 
             if (args.CurrentName == string.Empty)
             {
                 while (string.CompareOrdinal(args.CurrentValue, "..") == 0)
                 {
                     if (executionScope == null)
-                    { ThrowHelper.ThrowNoCommandContextExecutionScope(Name); }
+                    {
+                        ThrowHelper.ThrowNoCommandContextExecutionScope(Name);
+                    }
 
                     commandContext = executionScope.PopContext();
 
                     if (!args.MoveNext())
-                    { return; }
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -98,23 +107,34 @@ namespace Cmd.Net
                 if (args.CurrentName == string.Empty)
                 {
                     if (string.Compare(args.CurrentValue, "help", StringComparison.OrdinalIgnoreCase) == 0)
-                    { commandContext.ExecuteHelp(output, executionScope); return; }
+                    {
+                        commandContext.ExecuteHelp(output, executionScope);
+                        return;
+                    }
 
-                    commandContext.commands.TryGetCommand(args.CurrentValue, out commandBase);
+                    commandContext._commands.TryGetCommand(args.CurrentValue, out commandBase);
                     commandContext = commandBase as CommandContext;
 
                     if (commandContext == null)
-                    { break; }
+                    {
+                        break;
+                    }
 
                     if (executionScope != null)
-                    { executionScope.PushContext(commandContext); }
+                    {
+                        executionScope.PushContext(commandContext);
+                    }
                 }
                 else
                 {
                     if (string.CompareOrdinal(args.CurrentName, "?") == 0)
-                    { commandContext.ExecuteHelp(output, executionScope); return; }
+                    {
+                        commandContext.ExecuteHelp(output, executionScope); return;
+                    }
                     else
-                    { ThrowHelper.ThrowUnknownArgumentException(Name, args.CurrentName); }
+                    {
+                        ThrowHelper.ThrowUnknownArgumentException(Name, args.CurrentName);
+                    }
                 }
             }
             while (args.MoveNext());
@@ -122,7 +142,9 @@ namespace Cmd.Net
             if (commandBase == null)
             {
                 if (executionScope == null || executionScope.CurrentContext == this)
-                { ThrowHelper.ThrowUnknownCommandException(args.CurrentValue); }
+                {
+                    ThrowHelper.ThrowUnknownCommandException(args.CurrentValue);
+                }
             }
             else
             {
@@ -146,7 +168,7 @@ namespace Cmd.Net
                 CommandContextScope executionScope = CommandContextScope.Current;
 
                 if (executionScope == null)
-                { return null; }
+                    return null;
 
                 return executionScope.RootContext;
             }
@@ -163,7 +185,7 @@ namespace Cmd.Net
                 CommandContextScope executionScope = CommandContextScope.Current;
 
                 if (executionScope == null)
-                { return null; }
+                    return null;
 
                 return executionScope.CurrentContext;
             }
@@ -175,7 +197,7 @@ namespace Cmd.Net
         /// <value>The collection of child commands. The default is an empty collection.</value>
         public CommandCollection Commands
         {
-            get { return commands; }
+            get { return _commands; }
         }
 
         #endregion
@@ -187,7 +209,7 @@ namespace Cmd.Net
             if (executionScope != null)
             {
                 while (executionScope.CurrentContext != this)
-                { executionScope.PopContext(); }
+                    executionScope.PopContext();
             }
 
             string description = Description;
@@ -199,38 +221,45 @@ namespace Cmd.Net
                 output.WriteLine();
             }
 
-            if (commands.Count == 0)
-            { return; }
+            if (_commands.Count == 0)
+            {
+                return;
+            }
 
-            foreach (Command command in commands)
+            foreach (Command command in _commands)
             {
                 int commandNameLength = command.Name.Length;
 
                 if (commandNameLength > commandNameMaxLength)
-                { commandNameMaxLength = commandNameLength; }
+                    commandNameMaxLength = commandNameLength;
             }
 
             if (commandNameMaxLength < MaxCommandName)
-            { commandNameMaxLength = MaxCommandName; }
+            {
+                commandNameMaxLength = MaxCommandName;
+            }
 
-            foreach (Command command in commands.OrderBy((c) => c.Name, StringComparer.OrdinalIgnoreCase))
+            foreach (Command command in _commands.OrderBy((c) => c.Name, StringComparer.OrdinalIgnoreCase))
             {
                 output.Write(command.Name);
 
                 if (command.Description == null)
-                { output.WriteLine(); continue; }
+                {
+                    output.WriteLine();
+                    continue;
+                }
 
                 if (command.Name.Length < MaxCommandName)
                 {
                     for (int i = commandNameMaxLength - command.Name.Length; i >= 0; i--)
-                    { output.Write(' '); }
+                        output.Write(' ');
                 }
                 else
                 {
                     output.WriteLine();
 
                     for (int i = commandNameMaxLength; i >= 0; i--)
-                    { output.Write(' '); }
+                        output.Write(' ');
                 }
 
                 output.WriteLine(command.Description);

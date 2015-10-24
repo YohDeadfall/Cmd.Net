@@ -13,7 +13,7 @@ namespace Cmd.Net
 
         private const string ArgumentNameProperty = "ArgumentName";
 
-        private readonly string argumentName;
+        private readonly string _argumentName;
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace Cmd.Net
         protected CommandArgumentException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.argumentName = info.GetString(ArgumentNameProperty);
+            _argumentName = info.GetString(ArgumentNameProperty);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Cmd.Net
         public CommandArgumentException(string commandName, string argumentName)
             : base(commandName)
         {
-            this.argumentName = argumentName;
+            _argumentName = argumentName;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Cmd.Net
         public CommandArgumentException(string commandName, string argumentName, string message)
             : base(commandName, message)
         {
-            this.argumentName = commandName;
+            _argumentName = commandName;
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Cmd.Net
         public CommandArgumentException(string commandName, string argumentName, string message, Exception innerException)
             : base(commandName, message, innerException)
         {
-            this.argumentName = argumentName;
+            _argumentName = argumentName;
         }
 
         #endregion
@@ -86,7 +86,7 @@ namespace Cmd.Net
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue(ArgumentNameProperty, argumentName);
+            info.AddValue(ArgumentNameProperty, _argumentName);
         }
 
         #endregion
@@ -99,7 +99,7 @@ namespace Cmd.Net
         /// <value>The argument name.</value>
         public string ArgumentName
         {
-            get { return argumentName; }
+            get { return _argumentName; }
         }
 
         #endregion

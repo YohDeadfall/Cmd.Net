@@ -10,8 +10,8 @@ namespace Cmd.Net
     {
         #region Fields
 
-        private readonly string name;
-        private readonly string description;
+        private readonly string _name;
+        private readonly string _description;
 
         #endregion
 
@@ -45,8 +45,8 @@ namespace Cmd.Net
         {
             CommandHelpers.ValidateName("name", name, false);
 
-            this.name = name;
-            this.description = description;
+            _name = name;
+            _description = description;
         }
 
         #endregion
@@ -59,7 +59,7 @@ namespace Cmd.Net
         /// <value>The name of the command.</value>
         public string Name
         {
-            get { return name; }
+            get { return _name; }
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Cmd.Net
         /// <value>The description of the command.</value>
         public string Description
         {
-            get { return description; }
+            get { return _description; }
         }
 
         #endregion
@@ -172,13 +172,13 @@ namespace Cmd.Net
         public void Execute(TextReader input, TextWriter output, TextWriter error)
         {
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             string arguments = input.ReadLine();
 
@@ -204,16 +204,16 @@ namespace Cmd.Net
         public void Execute(TextReader input, TextWriter output, TextWriter error, ArgumentEnumerator args)
         {
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             if (args == null)
-            { throw new ArgumentNullException("args"); }
+                throw new ArgumentNullException("args");
 
             ExecuteCore(input, output, error, args);
         }
@@ -230,13 +230,13 @@ namespace Cmd.Net
         public void Execute(TextReader input, TextWriter output, TextWriter error, params string[] args)
         {
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             ExecuteCore(
                 input,
@@ -260,13 +260,13 @@ namespace Cmd.Net
         public void Execute(TextReader input, TextWriter output, TextWriter error, string args)
         {
             if (input == null)
-            { throw new ArgumentNullException("input"); }
+                throw new ArgumentNullException("input");
 
             if (output == null)
-            { throw new ArgumentNullException("output"); }
+                throw new ArgumentNullException("output");
 
             if (error == null)
-            { throw new ArgumentNullException("error"); }
+                throw new ArgumentNullException("error");
 
             ExecuteCore(
                 input,

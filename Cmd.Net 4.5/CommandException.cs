@@ -14,7 +14,7 @@ namespace Cmd.Net
 
         private const string CommandNameProperty = "CommandName";
 
-        private readonly string commandName;
+        private readonly string _commandName;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace Cmd.Net
         protected CommandException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.commandName = info.GetString(CommandNameProperty);
+            _commandName = info.GetString(CommandNameProperty);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Cmd.Net
         public CommandException(string commandName)
             : base(Resources.CommandExecutionException)
         {
-            this.commandName = commandName;
+            _commandName = commandName;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Cmd.Net
         public CommandException(string commandName, string message)
             : base(message)
         {
-            this.commandName = commandName;
+            _commandName = commandName;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Cmd.Net
         public CommandException(string commandName, string message, Exception innerException)
             : base(message, innerException)
         {
-            this.commandName = commandName;
+            _commandName = commandName;
         }
 
         #endregion
@@ -84,7 +84,7 @@ namespace Cmd.Net
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue(CommandNameProperty, commandName);
+            info.AddValue(CommandNameProperty, _commandName);
         }
 
         #endregion
@@ -97,7 +97,7 @@ namespace Cmd.Net
         /// <value>The command name.</value>
         public string CommandName
         {
-            get { return commandName; }
+            get { return _commandName; }
         }
 
         #endregion

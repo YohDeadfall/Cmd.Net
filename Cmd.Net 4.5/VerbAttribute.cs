@@ -10,7 +10,7 @@ namespace Cmd.Net
     {
         #region Fields
 
-        private readonly string verb;
+        private readonly string _verb;
 
         #endregion
 
@@ -28,7 +28,7 @@ namespace Cmd.Net
         public VerbAttribute(string verb)
         {
             CommandHelpers.ValidateName("verb", verb, false);
-            this.verb = verb;
+            _verb = verb;
         }
 
         #endregion
@@ -41,7 +41,7 @@ namespace Cmd.Net
         /// <value>The name stored in this attribute.</value>
         public string Verb
         {
-            get { return verb; }
+            get { return _verb; }
         }
 
         #endregion

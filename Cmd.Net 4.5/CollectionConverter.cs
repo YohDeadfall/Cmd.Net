@@ -11,10 +11,10 @@ namespace Cmd.Net
     {
         #region Fields
 
-        private readonly Type collectionType;
-        private readonly Type itemType;
-        private readonly TypeConverter itemTypeConverter;
-        private readonly bool collectionIsArray;
+        private readonly Type _collectionType;
+        private readonly Type _itemType;
+        private readonly TypeConverter _itemTypeConverter;
+        private readonly bool _collectionIsArray;
 
         #endregion
 
@@ -28,20 +28,23 @@ namespace Cmd.Net
         internal CollectionConverter(Type collectionType, Type itemType)
         {
             if (collectionType == null)
-            { throw new ArgumentNullException("collectionType"); }
+                throw new ArgumentNullException("collectionType");
 
             if (!typeof(IEnumerable).IsAssignableFrom(collectionType))
-            { throw new ArgumentException(); }
+                throw new ArgumentException();
 
             if (itemType == null)
-            { itemType = GetItemType(collectionType); }
+                itemType = GetItemType(collectionType);
             else
-            { CheckItemType(collectionType, itemType); }
+                CheckItemType(collectionType, itemType);
 
-            this.collectionType = collectionType;
-            this.itemType = itemType;
-            this.itemTypeConverter = TypeDescriptor.GetConverter(itemType);
-            this.collectionIsArray = collectionType.IsArray || collectionType == typeof(IEnumerable) || collectionType == typeof(IEnumerable<>).MakeGenericType(itemType);
+            _collectionType = collectionType;
+            _itemType = itemType;
+            _itemTypeConverter = TypeDescriptor.GetConverter(itemType);
+            _collectionIsArray =
+                collectionType.IsArray ||
+                collectionType == typeof(IEnumerable) ||
+                collectionType == typeof(IEnumerable<>).MakeGenericType(itemType);
         }
 
         #endregion
@@ -51,13 +54,13 @@ namespace Cmd.Net
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == null)
-            { throw new ArgumentNullException("sourceType"); }
+                throw new ArgumentNullException("sourceType");
 
-            if (this.collectionType.IsAssignableFrom(sourceType))
-            { return true; }
+            if (_collectionType.IsAssignableFrom(sourceType))
+                return true;
 
             if (typeof(IEnumerable).IsAssignableFrom(sourceType))
-            { return this.itemTypeConverter.CanConvertFrom(GetItemType(sourceType)); }
+                return _itemTypeConverter.CanConvertFrom(GetItemType(sourceType));
 
             return base.CanConvertFrom(context, sourceType);
         }
@@ -65,47 +68,47 @@ namespace Cmd.Net
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value == null)
-            { return null; }
+                return null;
 
-            if (this.collectionType.IsInstanceOfType(value))
-            { return value; }
+            if (_collectionType.IsInstanceOfType(value))
+                return value;
 
             IEnumerable sourceEnumerable = value as IEnumerable;
 
             if (sourceEnumerable == null)
-            { return base.ConvertFrom(context, culture, value); }
+                return base.ConvertFrom(context, culture, value);
 
-            if (this.collectionIsArray)
+            if (_collectionIsArray)
             {
                 IList sourceCollection = sourceEnumerable as IList;
                 IList destinationArray;
 
                 if (sourceCollection == null)
                 {
-                    IList destinationList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(this.itemType));
+                    IList destinationList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType));
 
                     foreach (object item in sourceEnumerable)
-                    { destinationList.Add(this.itemTypeConverter.ConvertFrom(item)); }
+                        destinationList.Add(_itemTypeConverter.ConvertFrom(item));
 
-                    destinationArray = (IList)Activator.CreateInstance(this.itemType.MakeArrayType(), destinationList.Count);
+                    destinationArray = (IList)Activator.CreateInstance(_itemType.MakeArrayType(), destinationList.Count);
                     destinationList.CopyTo((Array)destinationArray, 0);
                 }
                 else
                 {
-                    destinationArray = (IList)Activator.CreateInstance(this.itemType.MakeArrayType(), sourceCollection.Count);
+                    destinationArray = (IList)Activator.CreateInstance(_itemType.MakeArrayType(), sourceCollection.Count);
 
                     for (int i = 0; i < sourceCollection.Count; i++)
-                    { destinationArray[i] = this.itemTypeConverter.ConvertFrom(sourceCollection[i]); }
+                        destinationArray[i] = _itemTypeConverter.ConvertFrom(sourceCollection[i]);
                 }
 
                 return destinationArray;
             }
             else
             {
-                IList destinationList = (IList)Activator.CreateInstance(this.collectionType);
+                IList destinationList = (IList)Activator.CreateInstance(_collectionType);
 
                 foreach (object item in sourceEnumerable)
-                { destinationList.Add(this.itemTypeConverter.ConvertFrom(item)); }
+                    destinationList.Add(_itemTypeConverter.ConvertFrom(item));
 
                 return destinationList;
             }
@@ -117,13 +120,21 @@ namespace Cmd.Net
 
         private static void CheckItemType(Type collectionType, Type itemType)
         {
-            if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>) && collectionType.GetGenericArguments()[0] == itemType)
-            { return; }
+            if (collectionType.IsGenericType &&
+                collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+                collectionType.GetGenericArguments()[0] == itemType)
+            {
+                return;
+            }
 
             foreach (Type iface in collectionType.GetInterfaces())
             {
-                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IEnumerable<>) && iface.GetGenericArguments()[0] == itemType)
-                { return; }
+                if (iface.IsGenericType &&
+                    iface.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+                    iface.GetGenericArguments()[0] == itemType)
+                {
+                    return;
+                }
             }
 
             throw new ArgumentException("itemType");
@@ -131,13 +142,19 @@ namespace Cmd.Net
 
         private static Type GetItemType(Type collectionType)
         {
-            if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            { return collectionType.GetGenericArguments()[0]; }
+            if (collectionType.IsGenericType &&
+                collectionType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            {
+                return collectionType.GetGenericArguments()[0];
+            }
 
             foreach (Type iface in collectionType.GetInterfaces())
             {
-                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                { return iface.GetGenericArguments()[0]; }
+                if (iface.IsGenericType &&
+                    iface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    return iface.GetGenericArguments()[0];
+                }
             }
 
             return typeof(object);
