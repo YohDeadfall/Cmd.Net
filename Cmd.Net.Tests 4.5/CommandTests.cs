@@ -69,6 +69,24 @@ namespace Cmd.Net.Tests
             #endregion
         }
 
+        private enum SampleEnum
+        {
+            One,
+            Two,
+            Three
+        }
+
+        [Flags]
+        private enum SampleFlagEnum
+        {
+            [Flag('o')]
+            One = 1,
+            [Flag('t')]
+            Two = 2,
+            [Flag('f')]
+            Four = 4
+        }
+
         #endregion
 
         #region Public Methods
@@ -113,6 +131,20 @@ namespace Cmd.Net.Tests
         }
 
         [TestMethod]
+        public void EnumArgument()
+        {
+            new DelegateCommand(new Action<SampleEnum>(EnumArgumentCommand))
+                .Execute("two");
+        }
+
+        [TestMethod]
+        public void FlagEnumArgument()
+        {
+            new DelegateCommand(new Action<SampleFlagEnum>(FlagEnumArgumentCommand))
+                .Execute("tf");
+        }
+
+        [TestMethod]
         public void NamedArgument()
         {
             new DelegateCommand(new Action<string>(NamedArgumentCommand))
@@ -154,6 +186,18 @@ namespace Cmd.Net.Tests
 
             for (int i = 0; i < values.Length; i++)
             { Assert.AreEqual(i, values[i]); }
+        }
+
+        [Verb("EnumArgumentCommand")]
+        private static void EnumArgumentCommand(SampleEnum value)
+        {
+            Assert.AreEqual(SampleEnum.Two, value);
+        }
+
+        [Verb("FlagEnumArgumentCommand")]
+        private static void FlagEnumArgumentCommand(SampleFlagEnum value)
+        {
+            Assert.AreEqual(SampleFlagEnum.Two | SampleFlagEnum.Four, value);
         }
 
         [Verb("NamedArgumentCommand")]

@@ -18,6 +18,10 @@ namespace Cmd.Net.Tests
             return PermutationsIterator(collection, collection.Count);
         }
 
+        #endregion
+
+        #region Private Methods
+
         private static IEnumerable<IEnumerable<T>> PermutationsIterator<T>(IEnumerable<T> source, int count)
         {
             if (count == 1)

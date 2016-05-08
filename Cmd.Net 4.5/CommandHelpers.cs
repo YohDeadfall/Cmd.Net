@@ -104,6 +104,17 @@ namespace Cmd.Net
             return char.IsLetterOrDigit(c) || c == '-' || c == '_';
         }
 
+        internal static void ValidateFlagName(string argumentName, char value)
+        {
+            if (!IsValidFlagName(value))
+                throw new ArgumentException(null, argumentName);
+        }
+
+        internal static bool IsValidFlagName(char c)
+        {
+            return char.IsLetter(c) && char.IsUpper(c);
+        }
+
         #endregion
     }
 }

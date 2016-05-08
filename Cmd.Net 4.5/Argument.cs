@@ -21,7 +21,9 @@ namespace Cmd.Net
             AreMultipleAllowed = IsRequired << 1,
             IsInput = AreMultipleAllowed << 1,
             IsOutput = IsInput << 1,
-            IsError = IsOutput << 1
+            IsError = IsOutput << 1,
+            IsEnum = IsError << 1,
+            IsBitField = IsEnum << 1 | IsEnum
         }
 
         #endregion
@@ -97,69 +99,44 @@ namespace Cmd.Net
                 _type = parameterType;
                 _typeConverter = null;
                 _defaultValue = null;
-
-                return;
-            }
-
-            bool isCollectionArgument = parameterType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(parameterType);
-            TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)parameterInfo
-                .GetCustomAttributes(typeof(TypeConverterAttribute), true)
-                .FirstOrDefault();
-            TypeConverter typeConverter = null;
-
-            if (typeConverterAttribute != null && !string.IsNullOrEmpty(typeConverterAttribute.ConverterTypeName))
-            {
-                Type typeConverterType = Type.GetType(typeConverterAttribute.ConverterTypeName);
-
-                if (typeConverterType != null && typeof(TypeConverter).IsAssignableFrom(typeConverterType))
-                    typeConverter = (TypeConverter)Activator.CreateInstance(typeConverterType);
-            }
-
-            if (typeConverter == null)
-            {
-                typeConverter = (isCollectionArgument)
-                    ? new CollectionConverter(parameterType)
-                    : TypeDescriptor.GetConverter(parameterType);
-            }
-
-            if (isCollectionArgument)
-            {
-                if (!typeConverter.CanConvertFrom(typeof(IEnumerable<string>)))
-                    throw new InvalidOperationException();
             }
             else
             {
-                if (!typeConverter.CanConvertFrom(typeof(string)))
-                    throw new InvalidOperationException();
+                _argumentName = (argumentAttribute != null)
+                    ? argumentAttribute.Name
+                    : string.Empty;
+                _parameterName = parameterInfo.Name;
+
+                DescriptionAttribute descriptionAttribute = (DescriptionAttribute)parameterInfo
+                    .GetCustomAttributes(typeof(DescriptionAttribute), true)
+                    .FirstOrDefault();
+
+                _description = (descriptionAttribute != null)
+                    ? descriptionAttribute.Description
+                    : null;
+                _position = parameterInfo.Position;
+
+                SetFlag(
+                    ref _flags,
+                    Flags.IsRequired,
+                    !parameterInfo.IsOptional
+                    );
+                SetFlag(
+                    ref _flags,
+                    Flags.AreMultipleAllowed,
+                    parameterType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(parameterType)
+                    );
+                SetFlag(
+                    ref _flags,
+                    Flags.IsEnum,
+                    parameterType.IsEnum
+                    );
+
+                _type = parameterType;
+                _defaultValue = parameterInfo.DefaultValue;
+
+                SetTypeConverter(parameterInfo, AreMultipleAllowed, ref _typeConverter, ref _flags);
             }
-
-            DescriptionAttribute descriptionAttribute = (DescriptionAttribute)parameterInfo
-                .GetCustomAttributes(typeof(DescriptionAttribute), true)
-                .FirstOrDefault();
-
-            _argumentName = (argumentAttribute != null)
-                ? argumentAttribute.Name
-                : string.Empty;
-            _parameterName = parameterInfo.Name;
-            _description = (descriptionAttribute != null)
-                ? descriptionAttribute.Description
-                : null;
-            _position = parameterInfo.Position;
-
-            SetFlag(
-                ref _flags,
-                Flags.IsRequired,
-                !parameterInfo.IsOptional
-                );
-            SetFlag(
-                ref _flags,
-                Flags.AreMultipleAllowed,
-                isCollectionArgument || parameterType.IsEnum && parameterType.IsDefined(typeof(FlagsAttribute), false)
-                );
-
-            _type = parameterType;
-            _typeConverter = typeConverter;
-            _defaultValue = parameterInfo.DefaultValue;
         }
 
         #endregion
@@ -191,6 +168,11 @@ namespace Cmd.Net
             get { return _position; }
         }
 
+        internal bool IsNamed
+        {
+            get { return _argumentName.Length != 0; }
+        }
+
         internal bool IsRequired
         {
             get { return GetFlag(Flags.IsRequired); }
@@ -214,6 +196,16 @@ namespace Cmd.Net
         internal bool IsError
         {
             get { return GetFlag(Flags.IsError); }
+        }
+
+        internal bool IsEnum
+        {
+            get { return GetFlag(Flags.IsEnum); }
+        }
+
+        internal bool IsBitField
+        {
+            get { return GetFlag(Flags.IsBitField); }
         }
 
         internal Type Type
@@ -246,6 +238,58 @@ namespace Cmd.Net
                 flags |= requiredFlags;
             else
                 flags &= ~requiredFlags;
+        }
+
+        private static void SetTypeConverter(ParameterInfo parameterInfo, bool allowMultipleValues, ref TypeConverter typeConverter, ref Flags flags)
+        {
+            TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)parameterInfo
+                .GetCustomAttributes(typeof(TypeConverterAttribute), true)
+                .FirstOrDefault();
+
+            if (typeConverterAttribute != null && !string.IsNullOrEmpty(typeConverterAttribute.ConverterTypeName))
+            {
+                Type typeConverterType = Type.GetType(typeConverterAttribute.ConverterTypeName);
+
+                if (typeConverterType != null && typeof(TypeConverter).IsAssignableFrom(typeConverterType))
+                    typeConverter = (TypeConverter)Activator.CreateInstance(typeConverterType);
+            }
+
+            if (typeConverter == null)
+            {
+                Type parameterType = parameterInfo.ParameterType;
+
+                if (parameterType.IsEnum)
+                {
+                    if (parameterType.IsDefined(typeof(FlagsAttribute), false))
+                    {
+                        typeConverter = new FlagEnumConverter(parameterType);
+                        flags |= Flags.IsBitField;
+                    }
+                    else
+                    {
+                        typeConverter = new EnumConverter(parameterType);
+                        flags |= Flags.IsEnum;
+                    }
+                }
+                else
+                {
+                    if (allowMultipleValues)
+                        typeConverter = new CollectionConverter(parameterType);
+                    else
+                        typeConverter = TypeDescriptor.GetConverter(parameterType);
+                }
+            }
+
+            if (allowMultipleValues)
+            {
+                if (!typeConverter.CanConvertFrom(typeof(IEnumerable<string>)))
+                    throw new InvalidOperationException();
+            }
+            else
+            {
+                if (!typeConverter.CanConvertFrom(typeof(string)))
+                    throw new InvalidOperationException();
+            }
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cmd.Net.Properties;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -189,8 +190,15 @@ namespace Cmd.Net
 
         #region Fields
 
-        private readonly Dictionary<string, Argument> _arguments;
+        private const int ArgumentIndent = 4;
+        private const int EnumerationIndent = 8;
+        private const int DescriptionIndentMax = 24;
+        private const int DescriptionGap = 2;
+        private const int LinesBetweenSections = 2;
+
         private readonly Delegate _method;
+        private readonly Argument[] _argumentArray;
+        private readonly Dictionary<string, Argument> _argumentMap;
 
         #endregion
 
@@ -244,13 +252,17 @@ namespace Cmd.Net
             MethodInfo methodInfo = method.Method;
             ParameterInfo[] parameterInfos = methodInfo.GetParameters();
 
-            _arguments = new Dictionary<string, Argument>(StringComparer.OrdinalIgnoreCase);
             _method = method;
+            _argumentArray = new Argument[parameterInfos.Length];
+            _argumentMap = new Dictionary<string, Argument>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (ParameterInfo parameterInfo in methodInfo.GetParameters())
+            for (int i = 0; i < parameterInfos.Length; ++i)
             {
+                ParameterInfo parameterInfo = parameterInfos[i];
                 Argument argument = new Argument(parameterInfo);
-                _arguments.Add(argument.ArgumentName, argument);
+
+                _argumentArray[i] = argument;
+                _argumentMap.Add(argument.ArgumentName, argument);
             }
         }
 
@@ -322,14 +334,21 @@ namespace Cmd.Net
                 output.WriteLine();
             }
 
-            output.Write('/');
+            WriteSyntax(output);
+            WriteArguments(output);
+        }
+
+        private void WriteSyntax(TextWriter output)
+        {
+            output.WriteLine(Resources.SyntaxSection);
+            output.WriteLine();
+
+            for (int indent = 0; indent < ArgumentIndent; ++indent)
+                output.Write(' ');
+
             output.Write(Name);
 
-            IEnumerable<Argument> orderedArguments = (_arguments.Count > 0)
-                ? _arguments.Values.OrderBy((a) => a.Position).ToArray()
-                : Enumerable.Empty<Argument>();
-
-            foreach (Argument argument in orderedArguments)
+            foreach (Argument argument in _argumentArray)
             {
                 if (argument.IsInput || argument.IsOutput || argument.IsError)
                     continue;
@@ -353,31 +372,7 @@ namespace Cmd.Net
                     if (argument.Type != typeof(bool))
                     {
                         output.Write(':');
-
-                        if (argument.Type.IsEnum)
-                        {
-                            output.Write('{');
-
-                            IEnumerator nameEnumerator = Enum
-                                .GetNames(argument.Type)
-                                .GetEnumerator();
-                            bool nameEnumeratorMoveNext = nameEnumerator.MoveNext();
-
-                            while (nameEnumeratorMoveNext)
-                            {
-                                output.Write(nameEnumerator.Current);
-                                nameEnumeratorMoveNext = nameEnumerator.MoveNext();
-
-                                if (nameEnumeratorMoveNext)
-                                    output.Write('|');
-                            }
-
-                            output.Write('}');
-                        }
-                        else
-                        {
-                            output.Write("value");
-                        }
+                        output.Write(argument.ParameterName);
                     }
                 }
 
@@ -398,68 +393,151 @@ namespace Cmd.Net
                     output.Write(']');
             }
 
-            output.WriteLine();
-            output.WriteLine();
+            WriteEndSection(output);
+        }
 
-            int argumentNameMaxLength = 0;
-
-            if (_arguments.Count == 0)
-            {
+        private void WriteArguments(TextWriter output)
+        {
+            if (_argumentArray.Length == 0)
                 return;
-            }
 
-            foreach (Argument argument in orderedArguments)
+            output.WriteLine(Resources.AttributesSection);
+            output.WriteLine();
+
+            int descriptionIndent = 0;
+
+            foreach (Argument argument in _argumentArray)
             {
                 if (argument.IsInput || argument.IsOutput || argument.IsError)
                     continue;
 
-                int argumentNameLength = (argument.ArgumentName.Length == 0)
-                    ? argument.ParameterName.Length
-                    : argument.ArgumentName.Length;
+                int nameLength = (argument.IsNamed)
+                    ? argument.ArgumentName.Length + 1
+                    : argument.ParameterName.Length;
 
-                if (argumentNameLength > argumentNameMaxLength)
-                    argumentNameMaxLength = argumentNameLength;
-            }
-
-            foreach (Argument argument in orderedArguments)
-            {
-                if (argument.IsInput || argument.IsOutput || argument.IsError)
-                    continue;
-
-                int argumentNameLength = argument.ArgumentName.Length;
-
-                output.Write(' ');
-                output.Write(' ');
-
-                if (argumentNameLength == 0)
+                if (argument.IsEnum && !argument.IsBitField)
                 {
-                    argumentNameLength = argument.ParameterName.Length;
+                    int valueLengthMax = 0;
 
-                    output.Write(argument.ParameterName);
-                    output.Write(' ');
+                    foreach (FieldInfo value in argument.Type.GetFields(BindingFlags.Public | BindingFlags.Static))
+                    {
+                        int valueLength = value.Name.Length;
+
+                        if (valueLengthMax < valueLength)
+                            valueLengthMax = valueLength;
+                    }
+
+                    valueLengthMax += EnumerationIndent - ArgumentIndent;
+
+                    if (nameLength < valueLengthMax)
+                        nameLength = valueLengthMax;
                 }
-                else
+
+                if (descriptionIndent < nameLength)
+                    descriptionIndent = nameLength;
+            }
+
+            descriptionIndent += ArgumentIndent + DescriptionGap;
+
+            if (descriptionIndent > DescriptionIndentMax)
+                descriptionIndent = DescriptionIndentMax;
+
+            for (int argumentIndex = 0; argumentIndex < _argumentArray.Length; ++argumentIndex)
+            {
+                Argument argument = _argumentArray[argumentIndex];
+
+                if (argument.IsInput || argument.IsOutput || argument.IsError)
+                    continue;
+
+                if (argumentIndex > 0)
+                    output.WriteLine();
+
+                int indent;
+
+                for (indent = 0; indent < ArgumentIndent; ++indent)
+                    output.Write(' ');
+
+                if (argument.IsNamed)
                 {
+                    indent += argument.ArgumentName.Length + 1;
+
                     output.Write('/');
                     output.Write(argument.ArgumentName);
                 }
-
-
-                if (argumentNameLength < 12)
-                {
-                    for (int i = argumentNameMaxLength - argumentNameLength; i >= 0; i--)
-                        output.Write(' ');
-                }
                 else
                 {
-                    output.WriteLine();
+                    indent += argument.ParameterName.Length;
 
-                    for (int i = argumentNameMaxLength; i >= 0; i--)
-                        output.Write(' ');
+                    output.Write(argument.ParameterName);
                 }
 
-                output.WriteLine(argument.Description);
+                if (indent + DescriptionGap > descriptionIndent)
+                {
+                    indent = 0;
+                    output.WriteLine();
+                }
+
+                for (; indent < descriptionIndent; ++indent)
+                    output.Write(' ');
+
+                output.Write(argument.Description);
+
+                if (argument.IsEnum)
+                {
+                    foreach (FieldInfo value in argument.Type.GetFields(BindingFlags.Public | BindingFlags.Static))
+                    {
+                        string name = null;
+                        string description = null;
+
+                        if (argument.IsBitField)
+                        {
+                            FlagAttribute fa = value.GetCustomAttribute<FlagAttribute>();
+
+                            if (fa == null)
+                                continue;
+
+                            name = new string(fa.Name, 1);
+                        }
+                        else
+                        {
+                            name = value.Name;
+                        }
+
+                        DescriptionAttribute da = value.GetCustomAttribute<DescriptionAttribute>();
+
+                        if (da != null)
+                            description = da.Description;
+
+                        output.WriteLine();
+
+                        for (indent = 0; indent < EnumerationIndent; ++indent)
+                            output.Write(' ');
+
+                        output.Write(name);
+
+                        indent += name.Length;
+
+                        if (indent + DescriptionGap > descriptionIndent)
+                        {
+                            indent = 0;
+                            output.WriteLine();
+                        }
+
+                        for (; indent < descriptionIndent; ++indent)
+                            output.Write(' ');
+
+                        output.Write(description);
+                    }
+                }
             }
+
+            WriteEndSection(output);
+        }
+
+        private void WriteEndSection(TextWriter output)
+        {
+            for (int lines = LinesBetweenSections; lines > 0; --lines)
+                output.WriteLine();
         }
 
         private void ExecuteMethod(TextReader input, TextWriter output, TextWriter error, ArgumentEnumerator args)
@@ -469,7 +547,7 @@ namespace Cmd.Net
             object[] parameterValues = ParseArguments(args, error);
             Stream inOutStream = null;
 
-            foreach (Argument argument in _arguments.Values)
+            foreach (Argument argument in _argumentMap.Values)
             {
                 if (argument.IsInput && argument.IsOutput)
                 {
@@ -509,7 +587,7 @@ namespace Cmd.Net
 
         private object[] ParseArguments(ArgumentEnumerator args, TextWriter error)
         {
-            object[] parameterValues = new object[_arguments.Count];
+            object[] parameterValues = new object[_argumentMap.Count];
 
             for (int i = 0; i < parameterValues.Length; i++)
                 parameterValues[i] = Type.Missing;
@@ -518,7 +596,7 @@ namespace Cmd.Net
             {
                 Argument argument;
 
-                if (!_arguments.TryGetValue(argumentValue.Key, out argument))
+                if (!_argumentMap.TryGetValue(argumentValue.Key, out argument))
                     ThrowHelper.ThrowUnknownArgumentException(Name, argumentValue.Key);
 
                 int argumentValueCount = argumentValue.Count();
@@ -564,7 +642,7 @@ namespace Cmd.Net
                 }
             }
 
-            foreach (Argument argument in _arguments.Values)
+            foreach (Argument argument in _argumentMap.Values)
             {
                 if (!(argument.IsInput || argument.IsOutput || argument.IsError) && parameterValues[argument.Position] == Type.Missing)
                 {

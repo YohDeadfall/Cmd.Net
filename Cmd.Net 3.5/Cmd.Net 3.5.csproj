@@ -82,8 +82,17 @@
     <Compile Include="..\Cmd.Net 4.5\CommandHelpers.cs">
       <Link>CommandHelpers.cs</Link>
     </Compile>
+    <Compile Include="..\Cmd.Net 4.0\CustomAttributeExtensions.cs">
+      <Link>CustomAttributeExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Cmd.Net 4.5\ErrorAttribute.cs">
       <Link>ErrorAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\FlagAttribute.cs">
+      <Link>FlagAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Cmd.Net 4.5\FlagEnumConverter.cs">
+      <Link>FlagEnumConverter.cs</Link>
     </Compile>
     <Compile Include="..\Cmd.Net 4.5\InputAttribute.cs">
       <Link>InputAttribute.cs</Link>
