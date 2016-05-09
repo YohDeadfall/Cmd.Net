@@ -336,6 +336,7 @@ namespace Cmd.Net
 
             WriteSyntax(output);
             WriteArguments(output);
+            WriteRemarks(output);
         }
 
         private void WriteSyntax(TextWriter output)
@@ -532,6 +533,18 @@ namespace Cmd.Net
             }
 
             WriteEndSection(output);
+        }
+
+        private void WriteRemarks(TextWriter output)
+        {
+            RemarksAttribute ra = _method.Method.GetCustomAttribute<RemarksAttribute>();
+
+            if (ra != null)
+            {
+                output.Write(ra.Remarks);
+
+                WriteEndSection(output);
+            }
         }
 
         private void WriteEndSection(TextWriter output)

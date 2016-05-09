@@ -109,6 +109,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <Link>Properties\Resources.Designer.cs</Link>
     </Compile>
+    <Compile Include="..\Cmd.Net 4.5\RemarksAttribute.cs">
+      <Link>RemarksAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\Cmd.Net 4.5\ThrowHelper.cs">
       <Link>ThrowHelper.cs</Link>
     </Compile>

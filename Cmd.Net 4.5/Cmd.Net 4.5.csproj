@@ -66,6 +66,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RemarksAttribute.cs" />
     <Compile Include="ThrowHelper.cs" />
     <Compile Include="VerbAttribute.cs" />
   </ItemGroup>
