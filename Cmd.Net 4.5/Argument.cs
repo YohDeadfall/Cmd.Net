@@ -47,9 +47,9 @@ namespace Cmd.Net
         {
             Type parameterType = parameterInfo.ParameterType;
 
-            SetFlag(ref _flags, Flags.IsInput, parameterInfo.GetCustomAttributes(typeof(InputAttribute), true).Length > 0);
-            SetFlag(ref _flags, Flags.IsOutput, parameterInfo.GetCustomAttributes(typeof(OutputAttribute), true).Length > 0);
-            SetFlag(ref _flags, Flags.IsError, parameterInfo.GetCustomAttributes(typeof(ErrorAttribute), true).Length > 0);
+            SetFlag(ref _flags, Flags.IsInput, parameterInfo.IsDefined(typeof(InputAttribute), false));
+            SetFlag(ref _flags, Flags.IsOutput, parameterInfo.IsDefined(typeof(OutputAttribute), false));
+            SetFlag(ref _flags, Flags.IsError, parameterInfo.IsDefined(typeof(ErrorAttribute), false));
 
             if (IsInput)
             {
@@ -79,9 +79,7 @@ namespace Cmd.Net
                 }
             }
 
-            ArgumentAttribute argumentAttribute = (ArgumentAttribute)parameterInfo
-                .GetCustomAttributes(typeof(ArgumentAttribute), true)
-                .FirstOrDefault();
+            ArgumentAttribute argumentAttribute = parameterInfo.GetCustomAttribute<ArgumentAttribute>();
 
             if (IsInput || IsOutput || IsError)
             {
@@ -107,9 +105,7 @@ namespace Cmd.Net
                     : string.Empty;
                 _parameterName = parameterInfo.Name;
 
-                DescriptionAttribute descriptionAttribute = (DescriptionAttribute)parameterInfo
-                    .GetCustomAttributes(typeof(DescriptionAttribute), true)
-                    .FirstOrDefault();
+                DescriptionAttribute descriptionAttribute = (DescriptionAttribute)parameterInfo.GetCustomAttribute<DescriptionAttribute>();
 
                 _description = (descriptionAttribute != null)
                     ? descriptionAttribute.Description
@@ -242,9 +238,7 @@ namespace Cmd.Net
 
         private static void SetTypeConverter(ParameterInfo parameterInfo, bool allowMultipleValues, ref TypeConverter typeConverter, ref Flags flags)
         {
-            TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)parameterInfo
-                .GetCustomAttributes(typeof(TypeConverterAttribute), true)
-                .FirstOrDefault();
+            TypeConverterAttribute typeConverterAttribute = parameterInfo.GetCustomAttribute<TypeConverterAttribute>();
 
             if (typeConverterAttribute != null && !string.IsNullOrEmpty(typeConverterAttribute.ConverterTypeName))
             {
