@@ -1,6 +1,5 @@
 ﻿using Cmd.Net.Properties;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -481,7 +480,7 @@ namespace Cmd.Net
                 for (; indent < descriptionIndent; ++indent)
                     output.Write(' ');
 
-                output.Write(argument.Description);
+                WriteDescription(output, argument.Description, indent);
 
                 if (argument.IsEnum)
                 {
@@ -527,7 +526,7 @@ namespace Cmd.Net
                         for (; indent < descriptionIndent; ++indent)
                             output.Write(' ');
 
-                        output.Write(description);
+                        WriteDescription(output, description, indent);
                     }
                 }
             }
@@ -547,7 +546,35 @@ namespace Cmd.Net
             }
         }
 
-        private void WriteEndSection(TextWriter output)
+        private static void WriteDescription(TextWriter output, string value, int indent)
+        {
+            int index = 0;
+            int length = value.Length;
+            char ch = '\0';
+
+            while (index < length)
+            {
+                ch = value[index];
+                index++;
+
+                if (ch == '\r' || ch == '\n')
+                {
+                    if (index < length && value[index] == '\n')
+                        index++;
+
+                    output.WriteLine();
+
+                    for (int i = 0; i < indent; ++i)
+                        output.Write(' ');
+                }
+                else
+                {
+                    output.Write(ch);
+                }
+            }
+        }
+
+        private static void WriteEndSection(TextWriter output)
         {
             for (int lines = LinesBetweenSections; lines > 0; --lines)
                 output.WriteLine();
