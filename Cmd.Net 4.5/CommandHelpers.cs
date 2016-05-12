@@ -31,17 +31,7 @@ namespace Cmd.Net
                 throw new ArgumentNullException("output");
 
             Assembly entryAssembly = Assembly.GetEntryAssembly();
-            AssemblyTitleAttribute assemblyTitleAttribute = (AssemblyTitleAttribute)entryAssembly
-                .GetCustomAttributes(typeof(AssemblyTitleAttribute), false)
-                .FirstOrDefault();
-            AssemblyVersionAttribute assemblyVersionAttribute = (AssemblyVersionAttribute)entryAssembly
-                .GetCustomAttributes(typeof(AssemblyVersionAttribute), false)
-                .FirstOrDefault();
-            AssemblyCopyrightAttribute assemblyCopyrightAttribute = (AssemblyCopyrightAttribute)entryAssembly
-                .GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false)
-                .FirstOrDefault();
-
-            var x = entryAssembly.GetCustomAttributes(false);
+            AssemblyTitleAttribute assemblyTitleAttribute = entryAssembly.GetCustomAttribute<AssemblyTitleAttribute>();
 
             if (assemblyTitleAttribute == null)
                 output.Write(entryAssembly.FullName);
@@ -53,12 +43,16 @@ namespace Cmd.Net
             output.Write("Version");
             output.Write(' ');
 
+            AssemblyVersionAttribute assemblyVersionAttribute = entryAssembly.GetCustomAttribute<AssemblyVersionAttribute>();
+
             if (assemblyVersionAttribute == null)
                 output.Write(entryAssembly.GetName().Version);
             else
                 output.Write(assemblyVersionAttribute.Version);
 
             output.WriteLine(']');
+
+            AssemblyCopyrightAttribute assemblyCopyrightAttribute = entryAssembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
 
             if (assemblyCopyrightAttribute != null)
                 output.WriteLine(assemblyCopyrightAttribute.Copyright.Replace("©", "(c)"));
