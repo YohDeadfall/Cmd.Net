@@ -1,67 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace Cmd.Net
 {
-    /// <summary>
-    /// Provides utility methods that perform common tasks.
-    /// </summary>
-    public static class CommandHelpers
+    internal static class CommandHelpers
     {
-        #region Public Methods
-
-        /// <summary>
-        /// Writes a logo to the standard output stream.
-        /// </summary>
-        public static void WriteLogo()
-        {
-            WriteLogo(Console.Out);
-        }
-
-        /// <summary>
-        /// Writes a logo to the specified output stream.
-        /// </summary>
-        /// <param name="output">A <see cref="T:System.IO.TextWriter" /> that represents an output stream.</param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="output" /> is null.</exception>
-        public static void WriteLogo(TextWriter output)
-        {
-            if (output == null)
-                throw new ArgumentNullException("output");
-
-            Assembly entryAssembly = Assembly.GetEntryAssembly();
-            AssemblyTitleAttribute assemblyTitleAttribute = entryAssembly.GetCustomAttribute<AssemblyTitleAttribute>();
-
-            if (assemblyTitleAttribute == null)
-                output.Write(entryAssembly.FullName);
-            else
-                output.Write(assemblyTitleAttribute.Title);
-
-            output.Write(' ');
-            output.Write('[');
-            output.Write("Version");
-            output.Write(' ');
-
-            AssemblyVersionAttribute assemblyVersionAttribute = entryAssembly.GetCustomAttribute<AssemblyVersionAttribute>();
-
-            if (assemblyVersionAttribute == null)
-                output.Write(entryAssembly.GetName().Version);
-            else
-                output.Write(assemblyVersionAttribute.Version);
-
-            output.WriteLine(']');
-
-            AssemblyCopyrightAttribute assemblyCopyrightAttribute = entryAssembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
-
-            if (assemblyCopyrightAttribute != null)
-                output.WriteLine(assemblyCopyrightAttribute.Copyright.Replace("©", "(c)"));
-
-            output.WriteLine();
-        }
-
-        #endregion
-
         #region Internal Methods
 
         internal static void ValidateName(string argumentName, string value, bool isNullValid)

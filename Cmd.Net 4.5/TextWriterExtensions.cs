@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 
 namespace Cmd.Net
 {
@@ -56,6 +57,46 @@ namespace Cmd.Net
                     output.Write(ch);
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes a logo to the specified output stream.
+        /// </summary>
+        /// <param name="output">A <see cref="T:System.IO.TextWriter" /> that represents an output stream.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="output" /> is null.</exception>
+        public static void WriteLogo(TextWriter output)
+        {
+            if (output == null)
+                throw new ArgumentNullException("output");
+
+            Assembly entryAssembly = Assembly.GetEntryAssembly();
+            AssemblyTitleAttribute assemblyTitleAttribute = entryAssembly.GetCustomAttribute<AssemblyTitleAttribute>();
+
+            if (assemblyTitleAttribute == null)
+                output.Write(entryAssembly.FullName);
+            else
+                output.Write(assemblyTitleAttribute.Title);
+
+            output.Write(' ');
+            output.Write('[');
+            output.Write("Version");
+            output.Write(' ');
+
+            AssemblyVersionAttribute assemblyVersionAttribute = entryAssembly.GetCustomAttribute<AssemblyVersionAttribute>();
+
+            if (assemblyVersionAttribute == null)
+                output.Write(entryAssembly.GetName().Version);
+            else
+                output.Write(assemblyVersionAttribute.Version);
+
+            output.WriteLine(']');
+
+            AssemblyCopyrightAttribute assemblyCopyrightAttribute = entryAssembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+
+            if (assemblyCopyrightAttribute != null)
+                output.WriteLine(assemblyCopyrightAttribute.Copyright.Replace("©", "(c)"));
+
+            output.WriteLine();
         }
 
         #endregion
