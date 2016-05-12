@@ -68,6 +68,10 @@ namespace Cmd.Net.Examples
 
         [Verb("dir")]
         [Description("Displays a list of files and subdirectories in a directory.")]
+        [Remarks(
+            "Switches may be preset in the DIRCMD environment variable. Override\r\n"+
+            "preset switches by prefixing any switch with - (hyphen)--for example, / -W."
+            )]
         static void Dir(
             [Description("Specifies drive, directory, and/or files to list.")]
             string fileName = null,
@@ -81,7 +85,7 @@ namespace Cmd.Net.Examples
             bool bareFormat = false,
 
             [Argument("C")]
-            [Description("Display the thousand separator in file sizes.  This is the\r\ndefault.  Use /-C to disable display of separator.")]
+            [Description("Display the thousand separator in file sizes. This is the\r\ndefault. Use /-C to disable display of separator.")]
             bool thousandSeparator = true,
 
             [Argument("D")]
@@ -126,11 +130,11 @@ namespace Cmd.Net.Examples
 
             [Argument("X")]
             [Description(
-            "This displays the short names generated for non-8dot3 file\r\n" +
-            "names. The format is that of /N with the short name inserted\r\n" +
-            "before the long name. If no short name is present, blanks are\r\n" +
-            "displayed in its place."
-            )]
+                "This displays the short names generated for non-8dot3 file\r\n" +
+                "names. The format is that of /N with the short name inserted\r\n" +
+                "before the long name. If no short name is present, blanks are\r\n" +
+                "displayed in its place."
+                )]
             bool displayShortNames = false,
 
             [Argument("4")]
