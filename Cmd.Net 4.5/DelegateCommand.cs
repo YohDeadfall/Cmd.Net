@@ -189,12 +189,6 @@ namespace Cmd.Net
 
         #region Fields
 
-        private const int ArgumentIndent = 4;
-        private const int EnumerationIndent = 8;
-        private const int DescriptionIndentMax = 24;
-        private const int DescriptionGap = 2;
-        private const int LinesBetweenSections = 2;
-
         private readonly Delegate _method;
         private readonly Argument[] _argumentArray;
         private readonly Dictionary<string, Argument> _argumentMap;
@@ -328,10 +322,7 @@ namespace Cmd.Net
             string description = Description;
 
             if (description != null)
-            {
                 output.WriteLine(description);
-                output.WriteLine();
-            }
 
             WriteSyntax(output);
             WriteArguments(output);
@@ -340,6 +331,7 @@ namespace Cmd.Net
 
         private void WriteSyntax(TextWriter output)
         {
+            output.WriteLine();
             output.WriteLine(Resources.SyntaxSection);
             output.WriteLine();
 
@@ -393,7 +385,7 @@ namespace Cmd.Net
                     output.Write(']');
             }
 
-            WriteEndSection(output);
+            output.WriteLine();
         }
 
         private void WriteArguments(TextWriter output)
@@ -401,6 +393,7 @@ namespace Cmd.Net
             if (_argumentArray.Length == 0)
                 return;
 
+            output.WriteLine();
             output.WriteLine(Resources.AttributesSection);
             output.WriteLine();
 
@@ -480,7 +473,7 @@ namespace Cmd.Net
                 for (; indent < descriptionIndent; ++indent)
                     output.Write(' ');
 
-                WriteDescription(output, argument.Description, indent);
+                output.WriteIndented(argument.Description, indent);
 
                 if (argument.IsEnum)
                 {
@@ -526,12 +519,12 @@ namespace Cmd.Net
                         for (; indent < descriptionIndent; ++indent)
                             output.Write(' ');
 
-                        WriteDescription(output, description, indent);
+                        output.WriteIndented(description, indent);
                     }
                 }
             }
 
-            WriteEndSection(output);
+            output.WriteLine();
         }
 
         private void WriteRemarks(TextWriter output)
@@ -540,44 +533,9 @@ namespace Cmd.Net
 
             if (ra != null)
             {
-                output.Write(ra.Remarks);
-
-                WriteEndSection(output);
-            }
-        }
-
-        private static void WriteDescription(TextWriter output, string value, int indent)
-        {
-            int index = 0;
-            int length = value.Length;
-            char ch = '\0';
-
-            while (index < length)
-            {
-                ch = value[index];
-                index++;
-
-                if (ch == '\r' || ch == '\n')
-                {
-                    if (index < length && value[index] == '\n')
-                        index++;
-
-                    output.WriteLine();
-
-                    for (int i = 0; i < indent; ++i)
-                        output.Write(' ');
-                }
-                else
-                {
-                    output.Write(ch);
-                }
-            }
-        }
-
-        private static void WriteEndSection(TextWriter output)
-        {
-            for (int lines = LinesBetweenSections; lines > 0; --lines)
                 output.WriteLine();
+                output.WriteLine(ra.Remarks);
+            }
         }
 
         private void ExecuteMethod(TextReader input, TextWriter output, TextWriter error, ArgumentEnumerator args)

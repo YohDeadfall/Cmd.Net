@@ -61,7 +61,7 @@ namespace Cmd.Net.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attributes.
+        ///   Looks up a localized string similar to Attributes:.
         /// </summary>
         internal static string AttributesSection {
             get {
@@ -97,6 +97,15 @@ namespace Cmd.Net.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Commands:.
+        /// </summary>
+        internal static string CommandsSection {
+            get {
+                return ResourceManager.GetString("CommandsSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can not execute this command outside command execution scope..
         /// </summary>
         internal static string NoCommandContextExecutionScope {
@@ -124,7 +133,7 @@ namespace Cmd.Net.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Syntax.
+        ///   Looks up a localized string similar to Syntax:.
         /// </summary>
         internal static string SyntaxSection {
             get {

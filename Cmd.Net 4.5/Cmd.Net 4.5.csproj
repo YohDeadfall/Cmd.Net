@@ -67,6 +67,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RemarksAttribute.cs" />
+    <Compile Include="TextWriterExtensions.cs" />
     <Compile Include="ThrowHelper.cs" />
     <Compile Include="VerbAttribute.cs" />
   </ItemGroup>

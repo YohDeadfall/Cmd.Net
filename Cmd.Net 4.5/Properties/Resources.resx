@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AttributesSection" xml:space="preserve">
-    <value>Attributes</value>
+    <value>Attributes:</value>
   </data>
   <data name="CanNotParseArgumentValueException" xml:space="preserve">
     <value>Can not convert value of argument '{0}' to type '{1}'.</value>
@@ -128,6 +128,9 @@
   </data>
   <data name="CommandExecutionException" xml:space="preserve">
     <value>Command failed with unexpected error.</value>
+  </data>
+  <data name="CommandsSection" xml:space="preserve">
+    <value>Commands:</value>
   </data>
   <data name="NoCommandContextExecutionScope" xml:space="preserve">
     <value>Can not execute this command outside command execution scope.</value>
@@ -139,7 +142,7 @@
     <value>Argument '{0}' does not have a default value.</value>
   </data>
   <data name="SyntaxSection" xml:space="preserve">
-    <value>Syntax</value>
+    <value>Syntax:</value>
   </data>
   <data name="TooManyValuesForArgumentException" xml:space="preserve">
     <value>Too many values specified fot argument '{0}'.</value>

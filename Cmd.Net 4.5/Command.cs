@@ -13,6 +13,11 @@ namespace Cmd.Net
         private readonly string _name;
         private readonly string _description;
 
+        internal const int ArgumentIndent = 4;
+        internal const int EnumerationIndent = 8;
+        internal const int DescriptionIndentMax = 24;
+        internal const int DescriptionGap = 2;
+
         #endregion
 
         #region Constructors

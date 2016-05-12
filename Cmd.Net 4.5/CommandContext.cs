@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Cmd.Net.Properties;
+using System;
 using System.IO;
-using System.Linq;
 
 namespace Cmd.Net
 {
@@ -10,8 +10,6 @@ namespace Cmd.Net
     public sealed class CommandContext : Command
     {
         #region Fields
-
-        private const int MaxCommandName = 13;
 
         private readonly CommandCollection _commands = new CommandCollection();
 
@@ -213,56 +211,51 @@ namespace Cmd.Net
             }
 
             string description = Description;
-            int commandNameMaxLength = 0;
 
             if (description != null)
-            {
                 output.WriteLine(description);
-                output.WriteLine();
-            }
 
             if (_commands.Count == 0)
-            {
                 return;
-            }
+
+            output.WriteLine();
+            output.WriteLine(Resources.CommandsSection);
+            output.WriteLine();
+
+            int descriptionIndent = 0;
 
             foreach (Command command in _commands)
             {
-                int commandNameLength = command.Name.Length;
+                int nameLength = command.Name.Length;
 
-                if (commandNameLength > commandNameMaxLength)
-                    commandNameMaxLength = commandNameLength;
+                if (descriptionIndent < nameLength)
+                    descriptionIndent = nameLength;
             }
 
-            if (commandNameMaxLength < MaxCommandName)
-            {
-                commandNameMaxLength = MaxCommandName;
-            }
+            descriptionIndent += ArgumentIndent + DescriptionGap;
 
-            foreach (Command command in _commands.OrderBy((c) => c.Name, StringComparer.OrdinalIgnoreCase))
+            foreach (Command command in _commands)
             {
+                int indent;
+
+                for (indent = 0; indent < ArgumentIndent; ++indent)
+                    output.Write(' ');
+
+                indent += command.Name.Length;
+
                 output.Write(command.Name);
 
-                if (command.Description == null)
+                if (indent + DescriptionGap > descriptionIndent)
                 {
+                    indent = 0;
                     output.WriteLine();
-                    continue;
                 }
 
-                if (command.Name.Length < MaxCommandName)
-                {
-                    for (int i = commandNameMaxLength - command.Name.Length; i >= 0; i--)
-                        output.Write(' ');
-                }
-                else
-                {
-                    output.WriteLine();
+                for (; indent < descriptionIndent; ++indent)
+                    output.Write(' ');
 
-                    for (int i = commandNameMaxLength; i >= 0; i--)
-                        output.Write(' ');
-                }
-
-                output.WriteLine(command.Description);
+                output.WriteIndented(command.Description, indent);
+                output.WriteLine();
             }
         }
 
