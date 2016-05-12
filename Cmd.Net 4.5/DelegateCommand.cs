@@ -294,9 +294,7 @@ namespace Cmd.Net
             if (method == null)
                 return null;
 
-            VerbAttribute verbAttribute = (VerbAttribute)method.Method
-                .GetCustomAttributes(typeof(VerbAttribute), true)
-                .FirstOrDefault();
+            VerbAttribute verbAttribute = method.Method.GetCustomAttribute<VerbAttribute>();
 
             return (verbAttribute != null)
                 ? verbAttribute.Verb
@@ -308,9 +306,7 @@ namespace Cmd.Net
             if (method == null)
                 return null;
 
-            DescriptionAttribute descriptionAttribute = (DescriptionAttribute)method.Method
-                .GetCustomAttributes(typeof(DescriptionAttribute), true)
-                .FirstOrDefault();
+            DescriptionAttribute descriptionAttribute = method.Method.GetCustomAttribute<DescriptionAttribute>();
 
             return (descriptionAttribute != null)
                 ? descriptionAttribute.Description
