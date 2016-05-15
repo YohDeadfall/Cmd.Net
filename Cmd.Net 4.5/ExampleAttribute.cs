@@ -44,7 +44,7 @@ namespace Cmd.Net
                 throw new ArgumentException(null, "example");
 
             _example = example;
-            _description = description ?? string.Empty;
+            _description = description;
         }
 
         #endregion

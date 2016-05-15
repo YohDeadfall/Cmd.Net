@@ -21,7 +21,6 @@ namespace Cmd.Net
         /// </summary>
         public RemarksAttribute()
         {
-            _remarks = string.Empty;
         }
 
         /// <summary>
@@ -30,7 +29,7 @@ namespace Cmd.Net
         /// <param name="remarks">The remarks for an command.</param>
         public RemarksAttribute(string remarks)
         {
-            _remarks = remarks ?? string.Empty;
+            _remarks = remarks;
         }
 
         #endregion
