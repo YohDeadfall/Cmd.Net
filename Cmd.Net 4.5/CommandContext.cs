@@ -254,7 +254,7 @@ namespace Cmd.Net
                 for (; indent < descriptionIndent; ++indent)
                     output.Write(' ');
 
-                output.WriteIndented(command.Description, indent);
+                output.WriteIndented(command.Description, indent, false);
                 output.WriteLine();
             }
         }

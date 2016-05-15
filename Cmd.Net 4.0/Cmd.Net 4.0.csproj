@@ -87,6 +87,9 @@
     <Compile Include="..\Cmd.Net 4.5\ErrorAttribute.cs">
       <Link>ErrorAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\Cmd.Net 4.5\ExampleAttribute.cs">
+      <Link>ExampleAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\Cmd.Net 4.5\FlagAttribute.cs">
       <Link>FlagAttribute.cs</Link>
     </Compile>

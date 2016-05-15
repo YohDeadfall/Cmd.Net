@@ -56,6 +56,7 @@
     <Compile Include="CommandExtensions.cs" />
     <Compile Include="CommandHelpers.cs" />
     <Compile Include="ErrorAttribute.cs" />
+    <Compile Include="ExampleAttribute.cs" />
     <Compile Include="FlagAttribute.cs" />
     <Compile Include="FlagEnumConverter.cs" />
     <Compile Include="InputAttribute.cs" />

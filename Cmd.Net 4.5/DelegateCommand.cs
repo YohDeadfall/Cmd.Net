@@ -323,6 +323,7 @@ namespace Cmd.Net
             WriteSyntax(output);
             WriteArguments(output);
             WriteRemarks(output);
+            WriteExamples(output);
         }
 
         private void WriteSyntax(TextWriter output)
@@ -469,7 +470,7 @@ namespace Cmd.Net
                 for (; indent < descriptionIndent; ++indent)
                     output.Write(' ');
 
-                output.WriteIndented(argument.Description, indent);
+                output.WriteIndented(argument.Description, indent, false);
 
                 if (argument.IsEnum)
                 {
@@ -515,7 +516,7 @@ namespace Cmd.Net
                         for (; indent < descriptionIndent; ++indent)
                             output.Write(' ');
 
-                        output.WriteIndented(description, indent);
+                        output.WriteIndented(description, indent, false);
                     }
                 }
             }
@@ -531,6 +532,33 @@ namespace Cmd.Net
             {
                 output.WriteLine();
                 output.WriteLine(ra.Remarks);
+            }
+        }
+
+        private void WriteExamples(TextWriter output)
+        {
+            Attribute[] eas = Attribute.GetCustomAttributes(_method.Method, typeof(ExampleAttribute));
+
+            if (eas.Length == 0)
+                return;
+
+            output.WriteLine();
+            output.WriteLine(Resources.ExamplesSection);
+
+            foreach (ExampleAttribute ea in eas)
+            {
+                output.WriteLine();
+
+                string description = ea.Description;
+
+                if (description != null && description.Length > 0)
+                {
+                    output.WriteLine(description);
+                    output.WriteLine();
+                }
+
+                output.WriteIndented(ea.Example, ExampleIndent, true);
+                output.WriteLine();
             }
         }
 

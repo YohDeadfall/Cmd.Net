@@ -72,6 +72,8 @@ namespace Cmd.Net.Examples
             "Switches may be preset in the DIRCMD environment variable. Override\r\n"+
             "preset switches by prefixing any switch with - (hyphen)--for example, / -W."
             )]
+        [Example("dir /A:D", "Displays directories.")]
+        [Example("dir /A:H", "Displays hidden files.")]
         static void Dir(
             [Description("Specifies drive, directory, and/or files to list.")]
             string fileName = null,

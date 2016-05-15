@@ -106,6 +106,15 @@ namespace Cmd.Net.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Examples:.
+        /// </summary>
+        internal static string ExamplesSection {
+            get {
+                return ResourceManager.GetString("ExamplesSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can not execute this command outside command execution scope..
         /// </summary>
         internal static string NoCommandContextExecutionScope {

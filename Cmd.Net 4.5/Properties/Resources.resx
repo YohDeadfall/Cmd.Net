@@ -132,6 +132,9 @@
   <data name="CommandsSection" xml:space="preserve">
     <value>Commands:</value>
   </data>
+  <data name="ExamplesSection" xml:space="preserve">
+    <value>Examples:</value>
+  </data>
   <data name="NoCommandContextExecutionScope" xml:space="preserve">
     <value>Can not execute this command outside command execution scope.</value>
   </data>

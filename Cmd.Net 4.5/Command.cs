@@ -17,6 +17,7 @@ namespace Cmd.Net
         internal const int EnumerationIndent = 8;
         internal const int DescriptionIndentMax = 24;
         internal const int DescriptionGap = 2;
+        internal const int ExampleIndent = 4;
 
         #endregion
 
