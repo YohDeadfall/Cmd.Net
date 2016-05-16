@@ -72,12 +72,13 @@ namespace Cmd.Net
         /// <summary>
         /// Gets or sets the string stored as the description.
         /// </summary>
-        /// <value>The string stored as the description. The default value is an empty string ("").</value>
+        /// <value>The string stored as the description.</value>
         /// <remarks>
-        /// <para>The default implementation of the Description property simply returns this value.</para>
-        /// <para>This extra property exists so that you can derive from DescriptionAttribute and provide a localized version.
-        /// The derived localizable DescriptionAttribute will maintain a private Boolean field to indicate if it has been localized.
-        /// On the first access to the Description property, it will look up the localized string and store it back in the DescriptionValue property.</para>
+        /// <para>The default implementation of the <see cref="M:Cmd.Net.ExampleAttribute.Description" /> property simply returns this value.</para>
+        /// <para>This extra property exists so that you can derive from <see cref="T:Cmd.Net.ExampleAttribute" /> and provide a localized version.
+        /// The derived localizable <see cref="T:Cmd.Net.ExampleAttribute" /> will maintain a private Boolean field to indicate if it has been localized.
+        /// On the first access to the <see cref="M:Cmd.Net.ExampleAttribute.Description" /> property, it will look up the localized string and store it back
+        /// in the DescriptionValue property.</para>
         /// </remarks>
         protected string DescriptionValue
         {
