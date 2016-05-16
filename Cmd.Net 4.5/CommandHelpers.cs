@@ -1,9 +1,35 @@
 ﻿using System;
+using System.IO;
 
 namespace Cmd.Net
 {
-    internal static class CommandHelpers
+    /// <summary>
+    /// Provides utility methods that perform common tasks.
+    /// </summary>
+    public static class CommandHelpers
     {
+        #region Public Methods
+
+        /// <summary>
+        /// Writes a logo to the standard output stream.
+        /// </summary>
+        public static void WriteLogo()
+        {
+            WriteLogo(Console.Out);
+        }
+
+        /// <summary>
+        /// Writes a logo to the specified output stream.
+        /// </summary>
+        /// <param name="output">A <see cref="T:System.IO.TextWriter" /> that represents an output stream.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="output" /> is null.</exception>
+        public static void WriteLogo(TextWriter output)
+        {
+            output.WriteLogo();
+        }
+
+        #endregion
+
         #region Internal Methods
 
         internal static void ValidateName(string argumentName, string value, bool isNullValid)
