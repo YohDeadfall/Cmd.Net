@@ -87,7 +87,7 @@ namespace Cmd.Net
         /// </summary>
         /// <param name="output">A <see cref="T:System.IO.TextWriter" /> that represents an output stream.</param>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="output" /> is null.</exception>
-        public static void WriteLogo(TextWriter output)
+        public static void WriteLogo(this TextWriter output)
         {
             if (output == null)
                 throw new ArgumentNullException("output");
