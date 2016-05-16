@@ -99,6 +99,9 @@
     <Compile Include="..\Cmd.Net 4.5\InputAttribute.cs">
       <Link>InputAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\Cmd.Net 4.5\IOExtensions.cs">
+      <Link>IOExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Cmd.Net 4.5\OutputAttribute.cs">
       <Link>OutputAttribute.cs</Link>
     </Compile>
@@ -113,9 +116,6 @@
     </Compile>
     <Compile Include="..\Cmd.Net 4.5\RemarksAttribute.cs">
       <Link>RemarksAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\Cmd.Net 4.5\TextWriterExtensions.cs">
-      <Link>TextWriterExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Cmd.Net 4.5\ThrowHelper.cs">
       <Link>ThrowHelper.cs</Link>

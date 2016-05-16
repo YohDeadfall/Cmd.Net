@@ -7,7 +7,7 @@ namespace Cmd.Net
     /// <summary>
     /// Provides utility methods that perform common tasks.
     /// </summary>
-    public static class TextWriterExtensions
+    public static class IOExtensions
     {
         #region Public Methods
 
