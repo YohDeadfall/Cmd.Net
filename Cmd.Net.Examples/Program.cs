@@ -9,8 +9,8 @@ namespace Cmd.Net.Examples
         {
             new CommandContext(
                 "root",
-                new DelegateCommand(new Action<string, Attributes, bool, bool, bool, bool, bool, string, bool, bool, bool, bool, TimeField, bool, bool, bool>(Dir)),
-                new DelegateCommand(new Action<bool, string, string>(Move))
+                new Action<string, Attributes, bool, bool, bool, bool, bool, string, bool, bool, bool, bool, TimeField, bool, bool, bool>(Dir),
+                new Action<bool, string, string>(Move)
                 )
                 .ExecuteAll();
         }

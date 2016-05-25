@@ -79,6 +79,19 @@ namespace Cmd.Net
 
         #endregion
 
+        #region Operators
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="method"></param>
+        public static implicit operator Command(Delegate method)
+        {
+            return new DelegateCommand(method);
+        }
+
+        #endregion
+
         #region Public Methods
 
         /// <summary>
