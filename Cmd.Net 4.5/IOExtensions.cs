@@ -12,6 +12,23 @@ namespace Cmd.Net
         #region Public Methods
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="indent"></param>
+        public static void WriteIndent(this TextWriter output, int indent)
+        {
+            if (output == null)
+                throw new ArgumentNullException("output");
+
+            if (indent < 0)
+                throw new ArgumentOutOfRangeException("indent");
+
+            for (int i = 0; i < indent; ++i)
+                output.Write(' ');
+        }
+
+        /// <summary>
         /// Writes a string to the text string or stream with indentation of every line of the string.
         /// </summary>
         /// <param name="output">A <see cref="T:System.IO.TextWriter" /> that represents an output stream.</param>

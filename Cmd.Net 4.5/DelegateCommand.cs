@@ -267,7 +267,7 @@ namespace Cmd.Net
         protected override void ExecuteCore(TextReader input, TextWriter output, TextWriter error, ArgumentEnumerator args)
         {
             if (args.MoveNext() && string.CompareOrdinal(args.CurrentName, "?") == 0)
-                ExecuteHelp(output);
+                ExecuteHelp(output, args);
             else
                 ExecuteMethod(input, output, error, args);
         }
@@ -313,20 +313,22 @@ namespace Cmd.Net
                 : null;
         }
 
-        private void ExecuteHelp(TextWriter output)
+        private void ExecuteHelp(TextWriter output, ArgumentEnumerator args)
         {
             string description = Description;
 
             if (description != null)
                 output.WriteLine(description);
 
-            WriteSyntax(output);
-            WriteArguments(output);
+            char namePrefix = args.NamePrefix;
+
+            WriteSyntax(output, namePrefix);
+            WriteArguments(output, namePrefix);
             WriteRemarks(output);
-            WriteExamples(output);
+            WriteExamples(output, namePrefix);
         }
 
-        private void WriteSyntax(TextWriter output)
+        private void WriteSyntax(TextWriter output, char namePrefix)
         {
             output.WriteLine();
             output.WriteLine(Resources.SyntaxSection);
@@ -355,7 +357,7 @@ namespace Cmd.Net
                 }
                 else
                 {
-                    output.Write('/');
+                    output.Write(namePrefix);
                     output.Write(argument.ArgumentName);
 
                     if (argument.Type != typeof(bool))
@@ -385,7 +387,7 @@ namespace Cmd.Net
             output.WriteLine();
         }
 
-        private void WriteArguments(TextWriter output)
+        private void WriteArguments(TextWriter output, char namePrefix)
         {
             if (_argumentArray.Length == 0)
                 return;
@@ -451,7 +453,7 @@ namespace Cmd.Net
                 {
                     indent += argument.ArgumentName.Length + 1;
 
-                    output.Write('/');
+                    output.Write(namePrefix);
                     output.Write(argument.ArgumentName);
                 }
                 else
@@ -535,7 +537,7 @@ namespace Cmd.Net
             }
         }
 
-        private void WriteExamples(TextWriter output)
+        private void WriteExamples(TextWriter output, char namePrefix)
         {
             Attribute[] eas = Attribute.GetCustomAttributes(_method.Method, typeof(ExampleAttribute));
 
@@ -557,7 +559,25 @@ namespace Cmd.Net
                     output.WriteLine();
                 }
 
-                output.WriteIndented(ea.Example, ExampleIndent, true);
+                output.WriteIndent(ExampleIndent);
+                output.Write(Name);
+
+                ArgumentEnumerator args = new ArgumentEnumerator(ea.NamePrefix, ea.Example);
+
+                while (args.MoveNext())
+                {
+                    output.Write(' ');
+                    output.Write(namePrefix);
+                    output.Write(args.CurrentName);
+
+                    if (args.CurrentValue != bool.FalseString &&
+                        args.CurrentValue != bool.TrueString)
+                    {
+                        output.Write(':');
+                        output.Write(args.CurrentValue);
+                    }
+                }
+
                 output.WriteLine();
             }
         }

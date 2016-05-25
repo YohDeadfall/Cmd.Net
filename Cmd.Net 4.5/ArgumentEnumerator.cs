@@ -23,21 +23,60 @@ namespace Cmd.Net
         #endregion
 
         #region Fields
-
-        private static ArgumentEnumerator s_empty;
-
+        
         private State _state;
         private readonly int? _threadID;
         private readonly int _startIndex;
+        private readonly char _namePrefix;
         private string _originalArguments1;
         private string[] _originalArguments2;
         private KeyValuePair<string, string>[] _arguments;
         private KeyValuePair<string, string> _current;
         private int _currentIndex;
 
+        internal const char SlashNamePrefix = '/';
+        internal const char HyphenNamePrefix = '-';
+
+        private static ArgumentEnumerator s_empty;
+        private static char s_defaultNamePrefix = (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            ? SlashNamePrefix
+            : HyphenNamePrefix;
+
         #endregion
 
         #region Constructors
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="namePrefix"></param>
+        /// <param name="arguments"></param>
+        public ArgumentEnumerator(char namePrefix, string arguments)
+        {
+            if (arguments == null)
+                throw new ArgumentNullException("arguments");
+
+            _threadID = Thread.CurrentThread.ManagedThreadId;
+            _namePrefix = namePrefix;
+            _originalArguments1 = arguments;
+            _currentIndex = -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="namePrefix"></param>
+        /// <param name="arguments"></param>
+        public ArgumentEnumerator(char namePrefix, params string[] arguments)
+        {
+            if (arguments == null)
+                throw new ArgumentNullException("arguments");
+
+            _threadID = Thread.CurrentThread.ManagedThreadId;
+            _namePrefix = namePrefix;
+            _originalArguments2 = arguments;
+            _currentIndex = -1;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Cmd.Net.ArgumentEnumerator" /> class with the specified <see cref="T:System.String" />
@@ -46,13 +85,8 @@ namespace Cmd.Net
         /// <param name="arguments">Command-line arguments to be parsed and iterated.</param>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="arguments" /> is null.</exception>
         public ArgumentEnumerator(string arguments)
+            : this(DefaultNamePrefix, arguments)
         {
-            if (arguments == null)
-                throw new ArgumentNullException("arguments");
-
-            _threadID = Thread.CurrentThread.ManagedThreadId;
-            _originalArguments1 = arguments;
-            _currentIndex = -1;
         }
 
         /// <summary>
@@ -62,13 +96,8 @@ namespace Cmd.Net
         /// <param name="arguments">Command-line arguments to be parsed and iterated.</param>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="arguments" /> is null.</exception>
         public ArgumentEnumerator(params string[] arguments)
+            : this(DefaultNamePrefix, arguments)
         {
-            if (arguments == null)
-                throw new ArgumentNullException("arguments");
-
-            _threadID = Thread.CurrentThread.ManagedThreadId;
-            _originalArguments2 = arguments;
-            _currentIndex = -1;
         }
 
         private ArgumentEnumerator()
@@ -82,6 +111,7 @@ namespace Cmd.Net
             enumerator.ParseArguments();
 
             _threadID = Thread.CurrentThread.ManagedThreadId;
+            _namePrefix = enumerator._namePrefix;
             _originalArguments1 = enumerator._originalArguments1;
             _originalArguments2 = enumerator._originalArguments2;
             _arguments = enumerator._arguments;
@@ -212,6 +242,22 @@ namespace Cmd.Net
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static char DefaultNamePrefix
+        {
+            get { return s_defaultNamePrefix; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public char NamePrefix
+        {
+            get { return _namePrefix; }
+        }
+
+        /// <summary>
         /// Gets the current argument name in the collection. 
         /// </summary>
         /// <value>The current argument name in the collection or an empty string if the argument has no name.</value>
@@ -324,9 +370,9 @@ namespace Cmd.Net
             return argument.Substring(startIndex, endIndexLocal - startIndex);
         }
 
-        private static KeyValuePair<string, string> ParseArgument(string argument, int startIndex, out int endIndex, bool treatTailAsValue)
+        private static KeyValuePair<string, string> ParseArgument(string argument, int startIndex, out int endIndex, char namePrefix, bool treatTailAsValue)
         {
-            if (argument[startIndex] == '/')
+            if (argument[startIndex] == namePrefix)
             {
                 int delimiterIndex = -1;
                 char c = '\0';
@@ -377,7 +423,7 @@ namespace Cmd.Net
                 );
         }
 
-        private static KeyValuePair<string, string>[] ParseArguments(string arguments)
+        private static KeyValuePair<string, string>[] ParseArguments(string arguments, char namePrefix)
         {
             LinkedList<KeyValuePair<string, string>> result = null;
             char c = '\0';
@@ -398,7 +444,7 @@ namespace Cmd.Net
                 if (result == null)
                     result = new LinkedList<KeyValuePair<string, string>>();
 
-                result.AddLast(ParseArgument(arguments, startIndex, out endIndex, false));
+                result.AddLast(ParseArgument(arguments, startIndex, out endIndex, namePrefix, false));
             }
 
             return (result == null)
@@ -406,13 +452,13 @@ namespace Cmd.Net
                 : result.ToArray();
         }
 
-        private static KeyValuePair<string, string>[] ParseArguments(string[] arguments)
+        private static KeyValuePair<string, string>[] ParseArguments(string[] arguments, char namePrefix)
         {
             KeyValuePair<string, string>[] result = new KeyValuePair<string, string>[arguments.Length];
             int endIndex;
 
             for (int i = 0; i < arguments.Length; i++)
-                result[i] = ParseArgument(arguments[i], 0, out endIndex, true);
+                result[i] = ParseArgument(arguments[i], 0, out endIndex, namePrefix, true);
 
             return result;
         }
@@ -422,8 +468,8 @@ namespace Cmd.Net
             if (_arguments == null)
             {
                 _arguments = (_originalArguments1 == null)
-                    ? ParseArguments(_originalArguments2)
-                    : ParseArguments(_originalArguments1);
+                    ? ParseArguments(_originalArguments2, _namePrefix)
+                    : ParseArguments(_originalArguments1, _namePrefix);
             }
         }
 

@@ -23,7 +23,17 @@ namespace Cmd.Net
         /// </remarks>
         public static void ExecuteAll(this Command command)
         {
-            ExecuteAll(command, Console.In, Console.Out, Console.Error);
+            ExecuteAll(command, ArgumentEnumerator.DefaultNamePrefix);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="namePrefix"></param>
+        public static void ExecuteAll(this Command command, char namePrefix)
+        {
+            ExecuteAll(command, Console.In, Console.Out, Console.Error, namePrefix);
         }
 
         /// <summary>
@@ -61,6 +71,19 @@ namespace Cmd.Net
         /// </remarks>
         public static void ExecuteAll(this Command command, TextReader input, TextWriter output, TextWriter error)
         {
+            ExecuteAll(command, input, output, error, ArgumentEnumerator.DefaultNamePrefix);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        /// <param name="error"></param>
+        /// <param name="namePrefix"></param>
+        public static void ExecuteAll(this Command command, TextReader input, TextWriter output, TextWriter error, char namePrefix)
+        {
             if (command == null)
                 throw new ArgumentNullException("command");
 
@@ -73,12 +96,12 @@ namespace Cmd.Net
             if (error == null)
                 throw new ArgumentNullException("error");
 
-            CommandContext commandContext = command as CommandContext;
+            CommandContext context = command as CommandContext;
 
-            if (commandContext != null)
-                ExecuteContext(commandContext, input, output, output, true);
+            if (context != null)
+                ExecuteContext(context, input, output, output, true, namePrefix);
             else
-                ExecuteCommand(command, input, output, output, true);
+                ExecuteCommand(command, input, output, output, true, namePrefix);
         }
 
         /// <summary>
@@ -92,7 +115,17 @@ namespace Cmd.Net
         /// </remarks>
         public static void ExecuteSingle(this Command command)
         {
-            ExecuteSingle(command, Console.In, Console.Out, Console.Error);
+            ExecuteSingle(command, ArgumentEnumerator.DefaultNamePrefix);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="namePrefix"></param>
+        public static void ExecuteSingle(this Command command, char namePrefix)
+        {
+            ExecuteSingle(command, Console.In, Console.Out, Console.Error, namePrefix);
         }
 
         /// <summary>
@@ -128,6 +161,19 @@ namespace Cmd.Net
         /// </remarks>
         public static void ExecuteSingle(this Command command, TextReader input, TextWriter output, TextWriter error)
         {
+            ExecuteSingle(command, input, output, error, ArgumentEnumerator.DefaultNamePrefix);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        /// <param name="error"></param>
+        /// <param name="namePrefix"></param>
+        public static void ExecuteSingle(this Command command, TextReader input, TextWriter output, TextWriter error, char namePrefix)
+        {
             if (command == null)
                 throw new ArgumentNullException("command");
 
@@ -140,19 +186,26 @@ namespace Cmd.Net
             if (error == null)
                 throw new ArgumentNullException("error");
 
-            CommandContext commandContext = command as CommandContext;
+            CommandContext context = command as CommandContext;
 
-            if (commandContext != null)
-                ExecuteContext(commandContext, input, output, output, false);
+            if (context != null)
+                ExecuteContext(context, input, output, output, false, namePrefix);
             else
-                ExecuteCommand(command, input, output, output, false);
+                ExecuteCommand(command, input, output, output, false, namePrefix);
         }
 
         #endregion
 
         #region Private Methods
 
-        private static void ExecuteCommand(Command command, TextReader input, TextWriter output, TextWriter error, bool continiousExecution)
+        private static void ExecuteCommand(
+            Command command,
+            TextReader input,
+            TextWriter output,
+            TextWriter error,
+            bool continiousExecution,
+            char namePrefix
+            )
         {
             do
             {
@@ -165,7 +218,11 @@ namespace Cmd.Net
                     if (arguments == null)
                         break;
 
-                    command.Execute(input, output, error, arguments);
+                    ArgumentEnumerator enumerator = (string.IsNullOrEmpty(arguments))
+                        ? ArgumentEnumerator.Empty
+                        : new ArgumentEnumerator(namePrefix, arguments);
+
+                    command.Execute(input, output, error, enumerator);
                 }
                 catch (CommandException ex)
                 {
@@ -190,7 +247,14 @@ namespace Cmd.Net
             while (continiousExecution);
         }
 
-        private static void ExecuteContext(CommandContext command, TextReader input, TextWriter output, TextWriter error, bool continiousExecution)
+        private static void ExecuteContext(
+            CommandContext command,
+            TextReader input,
+            TextWriter output,
+            TextWriter error,
+            bool continiousExecution,
+            char namePrefix
+            )
         {
             using (CommandContextScope commandContextScope = new CommandContextScope(command))
             {
@@ -217,9 +281,13 @@ namespace Cmd.Net
                         if (arguments == null)
                             break;
 
+                        ArgumentEnumerator enumerator = (string.IsNullOrEmpty(arguments))
+                            ? ArgumentEnumerator.Empty
+                            : new ArgumentEnumerator(namePrefix, arguments);
+
                         commandContextScope
                             .CurrentContext
-                            .Execute(input, output, error, arguments);
+                            .Execute(input, output, error, enumerator);
                     }
                     catch (CommandException ex)
                     {

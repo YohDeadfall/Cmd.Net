@@ -11,6 +11,7 @@ namespace Cmd.Net
         #region Fields
 
         private readonly string _example;
+        private readonly char _namePrefix;
         private string _description;
 
         #endregion
@@ -24,7 +25,17 @@ namespace Cmd.Net
         /// <exception cref="T:System.ArgumentNullException"><paramref name="example" /> is null.</exception>
         /// <exception cref="T:System.ArgumentException"><paramref name="example" /> is an empty string ("").</exception>
         public ExampleAttribute(string example)
-            : this(example, null)
+            : this(example, ArgumentEnumerator.SlashNamePrefix, null)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="example"></param>
+        /// <param name="namePrefix"></param>
+        public ExampleAttribute(string example, char namePrefix)
+            : this(example, namePrefix, null)
         {
         }
 
@@ -36,6 +47,17 @@ namespace Cmd.Net
         /// <exception cref="T:System.ArgumentNullException"><paramref name="example" /> is null.</exception>
         /// <exception cref="T:System.ArgumentException"><paramref name="example" /> is an empty string ("").</exception>
         public ExampleAttribute(string example, string description)
+            : this(example, ArgumentEnumerator.SlashNamePrefix, description)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="example"></param>
+        /// <param name="namePrefix"></param>
+        /// <param name="description"></param>
+        public ExampleAttribute(string example, char namePrefix, string description)
         {
             if (example == null)
                 throw new ArgumentNullException("example");
@@ -44,6 +66,7 @@ namespace Cmd.Net
                 throw new ArgumentException(null, "example");
 
             _example = example;
+            _namePrefix = namePrefix;
             _description = description;
         }
 
@@ -58,6 +81,14 @@ namespace Cmd.Net
         public string Example
         {
             get { return _example; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public char NamePrefix
+        {
+            get { return _namePrefix; }
         }
 
         /// <summary>
