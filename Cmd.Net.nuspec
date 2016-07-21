@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Cmd.Net</id>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <title>Cmd.Net</title>
     <authors>Yoh Deadfall</authors>
     <owners>Yoh Deadfall</owners>
@@ -18,16 +18,18 @@
       <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
     </frameworkAssemblies>
     <releaseNotes>
-      * 1.4.0 - Added bit field arguments support.
-                Added remarks support in help generation.
-                Added examples support in help generation. 
-                Unified style for generated help.
-      * 1.3.1 - Fixed a bug with ArgumentEnumerator.GetEnumerator.
-      * 1.3.0 - Scope uses a name of an entry point assembly to create a new CommandContext.
-                If the error stream is unspecified then the output stream will be used for errors.
-                Properties of CommandContextScope were moved to CommandContext class.
-                ExecuteAll methods are moved to CommandExtensions.
-                ExecuteSingle methods are added to CommandExtensions.
+* 1.4.1 - Added argument name prefix customization support.
+          Added implicit conversion from Delegate to DelegateCommand. 
+* 1.4.0 - Added bit field arguments support.
+          Added remarks support in help generation.
+          Added examples support in help generation. 
+          Unified style for generated help.
+* 1.3.1 - Fixed a bug with ArgumentEnumerator.GetEnumerator.
+* 1.3.0 - Scope uses a name of an entry point assembly to create a new CommandContext.
+          If the error stream is unspecified then the output stream will be used for errors.
+          Properties of CommandContextScope were moved to CommandContext class.
+          ExecuteAll methods are moved to CommandExtensions.
+          ExecuteSingle methods are added to CommandExtensions.
     </releaseNotes>
   </metadata>
   <files>
