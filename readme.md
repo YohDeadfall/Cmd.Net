@@ -1,4 +1,8 @@
-﻿# Cmd.Net
+# Cmd.Net is archived
+
+The project is archived due to Microsoft work in the same area. [System.CommandLine](https://github.com/dotnet/command-line-api) is an actively developing project that could be used instead of this library.
+
+# Cmd.Net
 
 Cmd.Net is a .Net library for building command-line applications with supporting netsh-like contexts and automatic help generation. It provides a convenient and laconic API for working with the command line. The library allows you to forget about parser code writing and to concentrate on the application logic.
 
